@@ -1,3 +1,12 @@
+## [1.0.2](https://github.com/json-schema-tools/dereferencer/compare/1.0.1...1.0.2) (2020-06-27)
+
+
+### Bug Fixes
+
+* formatted json proper ([c8d6b34](https://github.com/json-schema-tools/dereferencer/commit/c8d6b34a23b5d597ec4628081ba5ed267ae03b6d))
+* improve typedocs ([b0d21ec](https://github.com/json-schema-tools/dereferencer/commit/b0d21ec1878b74b9517e72e218caf48d67ade3fa))
+* jsdoc formatting ([9d4f832](https://github.com/json-schema-tools/dereferencer/commit/9d4f832a9397629be9835ab5114a941d1232c750))
+
 ## [1.0.1](https://github.com/json-schema-tools/dereferencer/compare/1.0.0...1.0.1) (2020-06-26)
 
 
