@@ -1,5 +1,5 @@
 {
-  "name": "@json-schema-tools/transpiler",
+  "name": "@json-schema-tools/dereferencer",
   "mode": "file",
   "inputFiles": [
     "./src/index.ts"
