@@ -16,11 +16,9 @@
   "toc": [
     "Dereferencer",
     "DereferencerOptions",
-    "InvalidFileSystemPathError"
+    "InvalidFileSystemPathError",
     "InvalidJsonPointerRefError",
     "NonJsonRefError",
     "NonStringRefError"
-    "NonStringRefError"
-
   ]
 }
