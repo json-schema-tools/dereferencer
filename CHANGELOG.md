@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/json-schema-tools/dereferencer/compare/1.0.2...1.0.3) (2020-06-27)
+
+
+### Bug Fixes
+
+* docs have wrong title ([3fa6316](https://github.com/json-schema-tools/dereferencer/commit/3fa6316dcc5e07b6ce554e948e0840c1a9ffb26d))
+
 ## [1.0.2](https://github.com/json-schema-tools/dereferencer/compare/1.0.1...1.0.2) (2020-06-27)
 
 
