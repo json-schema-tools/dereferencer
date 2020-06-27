@@ -39,12 +39,12 @@ export interface DereferencerOptions {
  * @example
  * ```typescript
  *
- *import Dereferencer, { NonStringRefError } from "@json-schema-tools/dereferencer";
+ * import Dereferencer, { NonStringRefError } from "@json-schema-tools/dereferencer";
  *
- *try { const dereffer = new Dereferencer({}); }
- *catch(e) {
- *  if (e instanceof NonStringRefError) { ... }
- *}
+ * try { const dereffer = new Dereferencer({}); }
+ * catch(e) {
+ *   if (e instanceof NonStringRefError) { ... }
+ * }
  * ```
  *
  */
@@ -76,12 +76,12 @@ export class NonStringRefError extends Error {
  * @example
  * ```typescript
  *
- *import Dereferencer, { NonJsonRefError } from "@json-schema-tools/dereferencer";
- *const dereffer = new Dereferencer({});
- *try { await dereffer.resolve(); }
- *catch(e) {
- *  if (e instanceof NonJsonRefError) { ... }
- *}
+ * import Dereferencer, { NonJsonRefError } from "@json-schema-tools/dereferencer";
+ * const dereffer = new Dereferencer({});
+ * try { await dereffer.resolve(); }
+ * catch(e) {
+ *   if (e instanceof NonJsonRefError) { ... }
+ * }
  * ```
  *
  */
@@ -103,12 +103,12 @@ export class NonJsonRefError extends Error {
  * @example
  * ```typescript
  *
- *import Dereferencer, { InvalidJsonPointerRefError } from "@json-schema-tools/dereferencer";
- *const dereffer = new Dereferencer({});
- *try { await dereffer.resolve(); }
- *catch(e) {
- *  if (e instanceof InvalidJsonPointerRefError) { ... }
- *}
+ * import Dereferencer, { InvalidJsonPointerRefError } from "@json-schema-tools/dereferencer";
+ * const dereffer = new Dereferencer({});
+ * try { await dereffer.resolve(); }
+ * catch(e) {
+ *   if (e instanceof InvalidJsonPointerRefError) { ... }
+ * }
  * ```
  *
  */
@@ -129,12 +129,12 @@ export class InvalidJsonPointerRefError extends Error {
  * @example
  * ```typescript
  *
- *import Dereferencer, { InvalidFileSystemPathError } from "@json-schema-tools/dereferencer";
- *const dereffer = new Dereferencer({});
- *try { await dereffer.resolve(); }
- *catch(e) {
- *  if (e instanceof InvalidFileSystemPathError) { ... }
- *}
+ * import Dereferencer, { InvalidFileSystemPathError } from "@json-schema-tools/dereferencer";
+ * const dereffer = new Dereferencer({});
+ * try { await dereffer.resolve(); }
+ * catch(e) {
+ *   if (e instanceof InvalidFileSystemPathError) { ... }
+ * }
  * ```
  *
  */
