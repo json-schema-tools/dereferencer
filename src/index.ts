@@ -24,11 +24,31 @@ const readFile = (f: string): Promise<string> => {
   });
 };
 
-interface DereferencerOptions {
+/**
+ * Options that can be passed to the derefencer constructor.
+ */
+export interface DereferencerOptions {
+  // we dont actually have one yet
   placeholder?: boolean;
 }
 
-class NonStringRefError extends Error {
+/**
+ * Error thrown by the constructor when given a ref that isn't a string
+ *
+ *
+ * @example
+ * ```typescript
+ *
+ *import Dereferencer, { NonStringRefError } from "@json-schema-tools/dereferencer";
+ *
+ *try { const dereffer = new Dereferencer({}); }
+ *catch(e) {
+ *  if (e instanceof NonStringRefError) { ... }
+ *}
+ * ```
+ *
+ */
+export class NonStringRefError extends Error {
   constructor(schema: CoreSchemaMetaSchema) {
     let schemaString = "";
     try {
@@ -49,7 +69,23 @@ class NonStringRefError extends Error {
   }
 }
 
-class NonJsonRefError extends Error {
+/**
+ * Error thrown when the fetched reference is not properly formatted JSON or is encoded
+ * incorrectly
+ *
+ * @example
+ * ```typescript
+ *
+ *import Dereferencer, { NonJsonRefError } from "@json-schema-tools/dereferencer";
+ *const dereffer = new Dereferencer({});
+ *try { await dereffer.resolve(); }
+ *catch(e) {
+ *  if (e instanceof NonJsonRefError) { ... }
+ *}
+ * ```
+ *
+ */
+export class NonJsonRefError extends Error {
   constructor(schema: CoreSchemaMetaSchema, nonJson: string) {
     super(
       [
@@ -61,7 +97,22 @@ class NonJsonRefError extends Error {
   }
 }
 
-class InvalidJsonPointerRefError extends Error {
+/**
+ * Error thrown when a JSON pointer is provided but is not parseable as per the RFC6901
+ *
+ * @example
+ * ```typescript
+ *
+ *import Dereferencer, { InvalidJsonPointerRefError } from "@json-schema-tools/dereferencer";
+ *const dereffer = new Dereferencer({});
+ *try { await dereffer.resolve(); }
+ *catch(e) {
+ *  if (e instanceof InvalidJsonPointerRefError) { ... }
+ *}
+ * ```
+ *
+ */
+export class InvalidJsonPointerRefError extends Error {
   constructor(schema: CoreSchemaMetaSchema) {
     super(
       [
@@ -72,7 +123,22 @@ class InvalidJsonPointerRefError extends Error {
   }
 }
 
-class InvalidFileSystemPathError extends Error {
+/**
+ * Error thrown when given an invalid file system path as a reference.
+ *
+ * @example
+ * ```typescript
+ *
+ *import Dereferencer, { InvalidFileSystemPathError } from "@json-schema-tools/dereferencer";
+ *const dereffer = new Dereferencer({});
+ *try { await dereffer.resolve(); }
+ *catch(e) {
+ *  if (e instanceof InvalidFileSystemPathError) { ... }
+ *}
+ * ```
+ *
+ */
+export class InvalidFileSystemPathError extends Error {
   constructor(ref: string) {
     super(
       [
