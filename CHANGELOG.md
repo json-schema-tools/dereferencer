@@ -1,3 +1,11 @@
+## [1.0.4](https://github.com/json-schema-tools/dereferencer/compare/1.0.3...1.0.4) (2020-06-30)
+
+
+### Bug Fixes
+
+* all systems go ([6d051ff](https://github.com/json-schema-tools/dereferencer/commit/6d051ff83a50e2603b61547643b2434d711006af))
+* update deps ([4d7dbc7](https://github.com/json-schema-tools/dereferencer/commit/4d7dbc7d587e20b3358f564c98503d857f4daa0e))
+
 ## [1.0.3](https://github.com/json-schema-tools/dereferencer/compare/1.0.2...1.0.3) (2020-06-27)
 
 
