@@ -1,7 +1,7 @@
 {
   "name": "@json-schema-tools/dereferencer",
   "version": "0.0.0-development",
-  "description": "",
+  "description": "Dereference (aka parse refs) from JSON Schemas",
   "main": "build/index.js",
   "publishConfig": {
     "access": "public"
@@ -11,7 +11,7 @@
     "lint": "tslint --fix -p .",
     "test": "npm run lint && jest --coverage"
   },
-  "author": "",
+  "author": "BelfordZ<belfordz66@gmail.com>",
   "license": "Apache-2.0",
   "devDependencies": {
     "@json-schema-tools/meta-schema": "^1.0.10",

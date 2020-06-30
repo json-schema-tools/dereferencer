@@ -151,7 +151,8 @@ export class InvalidFileSystemPathError extends Error {
 }
 
 /**
- * When instantiated, represents a fully configured dereferencer.
+ * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
+ * No references are fetched until .resolve is called.
  */
 export class Dereferencer {
 
@@ -243,9 +244,9 @@ export class Dereferencer {
       } catch (e) {
         throw new NonJsonRefError({ $ref: ref }, await fetchResult.text());
       }
-    } catch (e) { /* noop */ }
-
-    throw new Error("Unhandled ref");
+    } catch (e) {
+      throw new Error("Unhandled ref");
+    }
   }
 
   /**
@@ -254,13 +255,18 @@ export class Dereferencer {
    */
   private collectRefs(): string[] {
     const refs: string[] = [];
+
     traverse(this.schema, (s) => {
       if (s.$ref && refs.indexOf(s.$ref) === -1) {
-        if (typeof s.$ref !== "string") { throw new NonStringRefError(s); }
+        if (typeof s.$ref !== "string") {
+          throw new NonStringRefError(s);
+        }
+
         refs.push(s.$ref);
       }
       return s;
     });
+
     return refs;
   }
 }
