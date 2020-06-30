@@ -20,7 +20,7 @@ describe("Dereferencer", () => {
     });
     const dereffed = await dereferencer.resolve();
     const props = dereffed.properties as ObjectWji6VXSR;
-    expect(props.bar).toStrictEqual(props.foo);
+    expect(props.bar).toBe(props.foo);
     expect(props.jsonSchemaMetaSchema.type).toBeDefined();
     expect(props.fromFile.type).toBeDefined();
   });
@@ -36,9 +36,9 @@ describe("Dereferencer", () => {
     });
     const dereffed = await dereferencer.resolve();
     const props = dereffed.properties as ObjectWji6VXSR;
-    expect(props.bar).toStrictEqual(props.foo);
-    expect(props.baz).toStrictEqual(props.foo);
-    expect(props.baz).toStrictEqual(props.bar);
+    expect(props.bar).toBe(props.foo);
+    expect(props.baz).toBe(props.foo);
+    expect(props.baz).toBe(props.bar);
   });
 
   it("order doesnt matter", async () => {
@@ -52,9 +52,9 @@ describe("Dereferencer", () => {
     });
     const dereffed = await dereferencer.resolve();
     const props = dereffed.properties as ObjectWji6VXSR;
-    expect(props.bar).toStrictEqual(props.foo);
-    expect(props.baz).toStrictEqual(props.foo);
-    expect(props.baz).toStrictEqual(props.bar);
+    expect(props.bar).toBe(props.foo);
+    expect(props.baz).toBe(props.foo);
+    expect(props.baz).toBe(props.bar);
     expect(props.baz.type).toBe("string");
   });
 

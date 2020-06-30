@@ -156,6 +156,7 @@ export class InvalidFileSystemPathError extends Error {
 export class Dereferencer {
 
   public refs: string[];
+  private refCache: { [k: string]: CoreSchemaMetaSchema } = {};
   private schema: CoreSchemaMetaSchema;
 
   constructor(schema: CoreSchemaMetaSchema, private options?: DereferencerOptions) {
@@ -172,22 +173,24 @@ export class Dereferencer {
    *
    */
   public async resolve(): Promise<CoreSchemaMetaSchema> {
-    const fetchedRefs = await Promise.all(this.refs.map((ref) => {
-      return this.fetchRef(ref).then((fetchedRef) => ({ [ref]: fetchedRef }));
-    }));
-
-    let refMap: { [s: string]: CoreSchemaMetaSchema } = {};
-    fetchedRefs.forEach((r) => { refMap = { ...refMap, ...r }; });
+    const refMap: { [s: string]: CoreSchemaMetaSchema } = {};
+    for (const ref of this.refs) {
+      refMap[ref] = await this.fetchRef(ref);
+    }
 
     return traverse(this.schema, (s) => {
       if (s.$ref !== undefined) {
         return refMap[s.$ref];
       }
       return s;
-    });
+    }, { mutable: true });
   }
 
   private async fetchRef(ref: string): Promise<CoreSchemaMetaSchema> {
+    if (this.refCache[ref] !== undefined) {
+      return this.refCache[ref];
+    }
+
     if (ref[0] === "#") {
       const withoutHash = ref.replace("#", "");
       try {
@@ -198,6 +201,7 @@ export class Dereferencer {
           return this.fetchRef(reffedSchema.$ref);
         }
 
+        this.refCache[ref] = reffedSchema;
         return Promise.resolve(reffedSchema);
       } catch (e) {
         throw new InvalidJsonPointerRefError({ $ref: ref });
@@ -219,6 +223,7 @@ export class Dereferencer {
       // (todo when we have validator)
 
       // return it
+      this.refCache[ref] = reffedSchema;
       return reffedSchema;
     } else if (["$", ".", "/"].indexOf(ref[0]) !== -1) {
       // there is good reason to assume this was intended to be a file path, but it was
@@ -232,6 +237,8 @@ export class Dereferencer {
       const fetchResult = await fetch(ref);
       try {
         const reffedSchema = await fetchResult.json();
+
+        this.refCache[ref] = reffedSchema;
         return reffedSchema;
       } catch (e) {
         throw new NonJsonRefError({ $ref: ref }, await fetchResult.text());
@@ -255,60 +262,6 @@ export class Dereferencer {
       return s;
     });
     return refs;
-  }
-
-  /**
-   * the guts
-   *
-   * At some point soon this should mainly just apply middleware that is available.
-   *
-   */
-  private async applyDeref(schema: CoreSchemaMetaSchema): Promise<CoreSchemaMetaSchema> {
-    if (schema.$ref === undefined) { return schema; }
-    if (typeof schema.$ref !== "string") { throw new NonStringRefError(schema); }
-
-    // handle internal reference
-    if (schema.$ref[0] === "#") {
-      const withoutHash = schema.$ref.replace("#", "");
-      try {
-        const pointer = Ptr.parse(withoutHash);
-        const reffedSchema = pointer.eval(this.schema);
-        return reffedSchema;
-      } catch (e) {
-        throw new InvalidJsonPointerRefError(schema);
-      }
-    }
-
-    // handle file references
-    if (await fileExistsAndReadable(schema.$ref) === true) {
-      const fileContents = await readFile(schema.$ref);
-      let reffedSchema;
-      try {
-        reffedSchema = JSON.parse(fileContents);
-      } catch (e) {
-        throw new NonJsonRefError(schema, fileContents);
-      }
-
-      // throw if not valid json schema
-      // (todo when we have validator)
-
-      // return it
-      return reffedSchema;
-    }
-
-    // handle http/https uri references
-    // this forms the base case. We use node-fetch (or injected fetch lib) and let r rip
-    try {
-      const fetchResult = await fetch(schema.$ref);
-      try {
-        const reffedSchema = await fetchResult.json();
-        return reffedSchema;
-      } catch (e) {
-        throw new NonJsonRefError(schema, await fetchResult.text());
-      }
-    } catch (e) { /* noop */ }
-
-    return schema;
   }
 }
 

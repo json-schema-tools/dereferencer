@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@json-schema-spec/json-pointer": "^0.1.2",
-    "@json-schema-tools/traverse": "^1.1.0",
+    "@json-schema-tools/traverse": "^1.2.0",
     "node-fetch": "^2.6.0"
   }
 }
