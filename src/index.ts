@@ -1,4 +1,4 @@
-import { CoreSchemaMetaSchema } from "@json-schema-tools/meta-schema";
+import { JSONMetaSchema } from "@json-schema-tools/meta-schema";
 import traverse from "@json-schema-tools/traverse";
 import * as fs from "fs";
 import fetch from "node-fetch";
@@ -49,7 +49,7 @@ export interface DereferencerOptions {
  *
  */
 export class NonStringRefError extends Error {
-  constructor(schema: CoreSchemaMetaSchema) {
+  constructor(schema: JSONMetaSchema) {
     let schemaString = "";
     try {
       schemaString = JSON.stringify(schema);
@@ -86,7 +86,7 @@ export class NonStringRefError extends Error {
  *
  */
 export class NonJsonRefError extends Error {
-  constructor(schema: CoreSchemaMetaSchema, nonJson: string) {
+  constructor(schema: JSONMetaSchema, nonJson: string) {
     super(
       [
         "NonJsonRefError",
@@ -113,7 +113,7 @@ export class NonJsonRefError extends Error {
  *
  */
 export class InvalidJsonPointerRefError extends Error {
-  constructor(schema: CoreSchemaMetaSchema) {
+  constructor(schema: JSONMetaSchema) {
     super(
       [
         "InvalidJsonPointerRefError",
@@ -156,10 +156,10 @@ export class InvalidFileSystemPathError extends Error {
 export class Dereferencer {
 
   public refs: string[];
-  private refCache: { [k: string]: CoreSchemaMetaSchema } = {};
-  private schema: CoreSchemaMetaSchema;
+  private refCache: { [k: string]: JSONMetaSchema } = {};
+  private schema: JSONMetaSchema;
 
-  constructor(schema: CoreSchemaMetaSchema, private options?: DereferencerOptions) {
+  constructor(schema: JSONMetaSchema, private options?: DereferencerOptions) {
     this.schema = { ...schema }; // start by making a shallow copy.
     this.refs = this.collectRefs();
   }
@@ -172,8 +172,8 @@ export class Dereferencer {
    *
    *
    */
-  public async resolve(): Promise<CoreSchemaMetaSchema> {
-    const refMap: { [s: string]: CoreSchemaMetaSchema } = {};
+  public async resolve(): Promise<JSONMetaSchema> {
+    const refMap: { [s: string]: JSONMetaSchema } = {};
     for (const ref of this.refs) {
       refMap[ref] = await this.fetchRef(ref);
     }
@@ -186,7 +186,7 @@ export class Dereferencer {
     }, { mutable: true });
   }
 
-  private async fetchRef(ref: string): Promise<CoreSchemaMetaSchema> {
+  private async fetchRef(ref: string): Promise<JSONMetaSchema> {
     if (this.refCache[ref] !== undefined) {
       return this.refCache[ref];
     }

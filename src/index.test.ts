@@ -1,5 +1,5 @@
 import Dereferencer from "./index";
-import { ObjectWji6VXSR } from "@json-schema-tools/meta-schema";
+import { Properties } from "@json-schema-tools/meta-schema";
 
 describe("Dereferencer", () => {
 
@@ -19,7 +19,7 @@ describe("Dereferencer", () => {
       },
     });
     const dereffed = await dereferencer.resolve();
-    const props = dereffed.properties as ObjectWji6VXSR;
+    const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
     expect(props.jsonSchemaMetaSchema.type).toBeDefined();
     expect(props.fromFile.type).toBeDefined();
@@ -35,7 +35,7 @@ describe("Dereferencer", () => {
       },
     });
     const dereffed = await dereferencer.resolve();
-    const props = dereffed.properties as ObjectWji6VXSR;
+    const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
     expect(props.baz).toBe(props.foo);
     expect(props.baz).toBe(props.bar);
@@ -51,7 +51,7 @@ describe("Dereferencer", () => {
       },
     });
     const dereffed = await dereferencer.resolve();
-    const props = dereffed.properties as ObjectWji6VXSR;
+    const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
     expect(props.baz).toBe(props.foo);
     expect(props.baz).toBe(props.bar);
