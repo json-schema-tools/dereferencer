@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/json-schema-tools/dereferencer/compare/1.0.4...1.0.5) (2020-06-30)
+
+
+### Bug Fixes
+
+* update random shit ([6e11447](https://github.com/json-schema-tools/dereferencer/commit/6e11447593455f0d9118558fe89bfdd83b61ff87))
+
 ## [1.0.4](https://github.com/json-schema-tools/dereferencer/compare/1.0.3...1.0.4) (2020-06-30)
 
 
