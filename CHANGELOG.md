@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/json-schema-tools/dereferencer/compare/1.0.6...1.0.7) (2020-07-01)
+
+
+### Bug Fixes
+
+* make docs work again ([8c76a2c](https://github.com/json-schema-tools/dereferencer/commit/8c76a2cb834f04eccc6adeb29acb32a66c9b16a7))
+
 ## [1.0.6](https://github.com/json-schema-tools/dereferencer/compare/1.0.5...1.0.6) (2020-07-01)
 
 
