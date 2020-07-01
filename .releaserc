@@ -7,7 +7,8 @@
     "@semantic-release/changelog",
     "@semantic-release/github",
     "@semantic-release/git",
-    "@semantic-release/npm"
+    "@semantic-release/npm",
+    "@qiwi/semantic-release-gh-pages-plugin"
   ],
   "verifyConditions": [
     "@semantic-release/changelog",
@@ -17,13 +18,13 @@
     "@qiwi/semantic-release-gh-pages-plugin"
   ],
   "publish": [
-    "@semantic-release/github",
     {
       "path": "@qiwi/semantic-release-gh-pages-plugin",
       "msg": "github pages release",
       "src": "docs/",
       "branch": "gh-pages"
     },
+    "@semantic-release/github",
     "@semantic-release/npm"
   ],
   "success": [
