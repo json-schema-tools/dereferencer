@@ -15,18 +15,18 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@json-schema-tools/meta-schema": "^1.0.10",
-    "@types/jest": "^24.0.13",
-    "@types/node": "^12.12.17",
+    "@json-schema-tools/traverse": "^1.2.2",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.12.47",
     "@types/node-fetch": "^2.5.7",
     "jest": "^24.8.0",
     "ts-jest": "^24.1.0",
-    "tslint": "^5.17.0",
-    "typedoc": "^0.15.5",
+    "tslint": "^5.20.1",
+    "typedoc": "^0.15.8",
     "typescript": "^3.7.3"
   },
   "dependencies": {
     "@json-schema-spec/json-pointer": "^0.1.2",
-    "@json-schema-tools/traverse": "^1.2.0",
     "node-fetch": "^2.6.0"
   }
 }
