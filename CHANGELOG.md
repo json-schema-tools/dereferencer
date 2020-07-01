@@ -1,3 +1,11 @@
+## [1.0.6](https://github.com/json-schema-tools/dereferencer/compare/1.0.5...1.0.6) (2020-07-01)
+
+
+### Bug Fixes
+
+* add node version file ([5eb3576](https://github.com/json-schema-tools/dereferencer/commit/5eb35760d511801482ce24240d6016a284a1cd10))
+* update deps ([baa45bf](https://github.com/json-schema-tools/dereferencer/commit/baa45bf612da0023ea9f6af60f8fd41b7fcbeacf))
+
 ## [1.0.5](https://github.com/json-schema-tools/dereferencer/compare/1.0.4...1.0.5) (2020-06-30)
 
 
