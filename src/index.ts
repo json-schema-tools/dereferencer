@@ -191,7 +191,8 @@ export class Dereferencer {
       const fetched = await this.fetchRef(ref);
 
       if (this.options.recursive === true && ref[0] !== "#") {
-        const subDereffer = new Dereferencer(fetched, this.options); // might want to reconsider the class interface... lol
+        // might want to reconsider the class interface... lol
+        const subDereffer = new Dereferencer(fetched, this.options);
         const subFetched = await subDereffer.resolve();
         refMap[ref] = subFetched;
       } else {

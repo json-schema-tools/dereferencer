@@ -6,6 +6,7 @@ features:
 - minimal dependencies
 - simple & fast
 - cycle detection/handling
+- switchable recusive dereferencing
 - handles:
   - relative pointer refs
   - http/https uris
