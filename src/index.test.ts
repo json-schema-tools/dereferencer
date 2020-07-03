@@ -20,7 +20,9 @@ describe("Dereferencer", () => {
     const dereffed = await dereferencer.resolve();
     const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
-    expect(props.fromFile.type).toBeDefined();
+    expect(props.fromFile).not.toBe(props.bar);
+    expect(props.fromFile).not.toBe(props.foo);
+    expect(props.fromFile.type).toBe("string");
   });
 
   it("can ref other refs", async () => {

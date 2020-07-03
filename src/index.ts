@@ -34,12 +34,10 @@ export interface DereferencerOptions {
    * If true, resolved non-local references will also be dereferenced using the same options.
    */
   recursive?: boolean;
-  useRefCache: RefCache;
 }
 
 export const defaultDereferencerOptions: DereferencerOptions = {
   recursive: true,
-  useRefCache: {},
 };
 
 /**
@@ -167,11 +165,10 @@ export class InvalidFileSystemPathError extends Error {
 export class Dereferencer {
 
   public refs: string[];
-  private refCache: RefCache;
+  private refCache: RefCache = {};
   private schema: JSONMetaSchema;
 
   constructor(schema: JSONMetaSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
-    this.refCache = options.useRefCache;
     // this.schema = { ...schema }; // start by making a shallow copy.
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
@@ -188,8 +185,6 @@ export class Dereferencer {
   public async resolve(): Promise<JSONMetaSchema> {
     const refMap: { [s: string]: JSONMetaSchema } = {};
 
-    console.log("the refs:", this.refs); // tslint:disable-line
-
     if (this.refs.length === 0) { return this.schema; }
 
     for (const ref of this.refs) {
@@ -203,8 +198,6 @@ export class Dereferencer {
         refMap[ref] = fetched;
       }
     }
-
-    console.log("finished getting all refMap Vals", refMap); //tslint:disable-line
 
     traverse(this.schema, (s) => {
       if (s.$ref !== undefined) {
