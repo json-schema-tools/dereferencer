@@ -59,6 +59,7 @@ describe("Dereferencer", () => {
   });
 
   it("can handle recursively dereffing", async () => {
+    expect.assertions(4);
     const dereferencer = new Dereferencer({
       type: "object",
       properties: {
@@ -72,4 +73,13 @@ describe("Dereferencer", () => {
     expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].$ref).toBeUndefined();
     expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].type).toBe("integer");
   });
+
+  it.only("can deal with root refs", async () => {
+    const dereferencer = new Dereferencer({
+      $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json",
+    });
+    const dereffed = await dereferencer.resolve();
+    expect(dereffed).toBeDefined();
+  });
+
 });

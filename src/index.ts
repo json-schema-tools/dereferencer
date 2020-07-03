@@ -172,6 +172,7 @@ export class Dereferencer {
     // this.schema = { ...schema }; // start by making a shallow copy.
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
+    console.log("refs collected: ", this.refs); // tslint:disable-line
   }
 
   /**
@@ -187,18 +188,25 @@ export class Dereferencer {
 
     if (this.refs.length === 0) { return this.schema; }
 
+    console.log(this.refs); // tslint:disable-line
     for (const ref of this.refs) {
       const fetched = await this.fetchRef(ref);
 
+      console.log('finished fetching refs'); // tslint:disable-line
       if (this.options.recursive === true && ref[0] !== "#") {
         // might want to reconsider the class interface... lol
+
+        console.log('creating new dereffer'); // tslint:disable-line
         const subDereffer = new Dereferencer(fetched, this.options);
         const subFetched = await subDereffer.resolve();
+        console.log('finished resolving subrefs'); // tslint:disable-line
         refMap[ref] = subFetched;
       } else {
         refMap[ref] = fetched;
       }
     }
+
+    await Promise.all(Object.values(refMap));
 
     traverse(this.schema, (s) => {
       if (s.$ref !== undefined) {
@@ -264,16 +272,24 @@ export class Dereferencer {
     // handle http/https uri references
     // this forms the base case. We use node-fetch (or injected fetch lib) and let r rip
     try {
+      console.log("fetching url"); // tslint:disable-line
       const fetchResult = await fetch(ref);
+      console.log("fetch success"); // tslint:disable-line
       try {
+        console.log("parsing fetched result to json"); // tslint:disable-line
         const reffedSchema = await fetchResult.json();
+        console.log("json parsing complete"); // tslint:disable-line
 
         this.refCache[ref] = reffedSchema;
+
+        console.log("fetched url", reffedSchema); // tslint:disable-line
         return reffedSchema;
       } catch (e) {
+        console.log("found big ol json parse error", e); // tslint:disable-line
         throw new NonJsonRefError({ $ref: ref }, await fetchResult.text());
       }
     } catch (e) {
+      console.log("found fetch error", e); // tslint:disable-line
       throw new Error("Unhandled ref");
     }
   }
