@@ -70,5 +70,6 @@ describe("Dereferencer", () => {
     expect(props.jsonSchemaMetaSchema.type).toBeDefined();
     expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0).toBeDefined();
     expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].$ref).toBeUndefined();
+    expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].type).toBe("integer");
   });
 });
