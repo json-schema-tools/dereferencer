@@ -14,14 +14,12 @@ describe("Dereferencer", () => {
       properties: {
         foo: { type: "string" },
         bar: { $ref: "#/properties/foo" },
-        jsonSchemaMetaSchema: { $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json" },
         fromFile: { $ref: "./src/test-schema.json" },
       },
     });
     const dereffed = await dereferencer.resolve();
     const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
-    expect(props.jsonSchemaMetaSchema.type).toBeDefined();
     expect(props.fromFile.type).toBeDefined();
   });
 
@@ -58,4 +56,17 @@ describe("Dereferencer", () => {
     expect(props.baz.type).toBe("string");
   });
 
+  it("can handle recursively dereffing", async () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        jsonSchemaMetaSchema: { $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json" },
+      },
+    });
+    const dereffed = await dereferencer.resolve();
+    const props = dereffed.properties as Properties;
+    expect(props.jsonSchemaMetaSchema.type).toBeDefined();
+    expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0).toBeDefined();
+    expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].$ref).toBeUndefined();
+  });
 });
