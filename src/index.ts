@@ -207,9 +207,13 @@ export class Dereferencer {
       return s;
     }, { mutable: true });
 
-    this.refs = this.collectRefs();
+    if (this.options.recursive === true) {
+      this.refs = this.collectRefs();
 
-    return this.resolve();
+      return this.resolve();
+    } else {
+      return this.schema;
+    }
   }
 
   private async fetchRef(ref: string): Promise<JSONMetaSchema> {
