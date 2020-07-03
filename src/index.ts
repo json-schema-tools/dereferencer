@@ -24,13 +24,21 @@ const readFile = (f: string): Promise<string> => {
   });
 };
 
+export interface RefCache { [k: string]: JSONMetaSchema; }
+
 /**
  * Options that can be passed to the derefencer constructor.
  */
 export interface DereferencerOptions {
-  // we dont actually have one yet
-  placeholder?: boolean;
+  /**
+   * If true, resolved non-local references will also be dereferenced using the same options.
+   */
+  recursive?: boolean;
 }
+
+export const defaultDereferencerOptions: DereferencerOptions = {
+  recursive: true,
+};
 
 /**
  * Error thrown by the constructor when given a ref that isn't a string
@@ -157,11 +165,12 @@ export class InvalidFileSystemPathError extends Error {
 export class Dereferencer {
 
   public refs: string[];
-  private refCache: { [k: string]: JSONMetaSchema } = {};
+  private refCache: RefCache = {};
   private schema: JSONMetaSchema;
 
-  constructor(schema: JSONMetaSchema, private options?: DereferencerOptions) {
-    this.schema = { ...schema }; // start by making a shallow copy.
+  constructor(schema: JSONMetaSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
+    // this.schema = { ...schema }; // start by making a shallow copy.
+    this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
 
@@ -175,16 +184,36 @@ export class Dereferencer {
    */
   public async resolve(): Promise<JSONMetaSchema> {
     const refMap: { [s: string]: JSONMetaSchema } = {};
+
+    if (this.refs.length === 0) { return this.schema; }
+
     for (const ref of this.refs) {
-      refMap[ref] = await this.fetchRef(ref);
+      const fetched = await this.fetchRef(ref);
+
+      if (this.options.recursive === true && ref[0] !== "#") {
+        // might want to reconsider the class interface... lol
+        const subDereffer = new Dereferencer(fetched, this.options);
+        const subFetched = await subDereffer.resolve();
+        refMap[ref] = subFetched;
+      } else {
+        refMap[ref] = fetched;
+      }
     }
 
-    return traverse(this.schema, (s) => {
+    traverse(this.schema, (s) => {
       if (s.$ref !== undefined) {
         return refMap[s.$ref];
       }
       return s;
     }, { mutable: true });
+
+    if (this.options.recursive === true) {
+      this.refs = this.collectRefs();
+
+      return this.resolve();
+    } else {
+      return this.schema;
+    }
   }
 
   private async fetchRef(ref: string): Promise<JSONMetaSchema> {
