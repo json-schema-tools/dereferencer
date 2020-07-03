@@ -23,7 +23,7 @@
     "ts-jest": "^24.1.0",
     "tslint": "^5.20.1",
     "typedoc": "^0.15.8",
-    "typescript": "^3.7.3"
+    "typescript": "^3.9.6"
   },
   "dependencies": {
     "@json-schema-spec/json-pointer": "^0.1.2",
