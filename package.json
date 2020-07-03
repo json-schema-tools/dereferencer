@@ -17,7 +17,7 @@
     "@json-schema-tools/meta-schema": "^1.0.10",
     "@json-schema-tools/traverse": "^1.2.2",
     "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.47",
+    "@types/node": "^14.0.14",
     "@types/node-fetch": "^2.5.7",
     "jest": "^24.8.0",
     "ts-jest": "^24.1.0",
