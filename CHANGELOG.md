@@ -1,3 +1,15 @@
+## [1.0.8](https://github.com/json-schema-tools/dereferencer/compare/1.0.7...1.0.8) (2020-07-03)
+
+
+### Bug Fixes
+
+* add comment ([f38a026](https://github.com/json-schema-tools/dereferencer/commit/f38a0268ab9107a101cd606318a0894b14139873))
+* add recursive functionality - almost fully working ([baab2be](https://github.com/json-schema-tools/dereferencer/commit/baab2be1d2ebd14e91f27a03a58a25abd6282674))
+* make non-recursive mode work proper ([64b1141](https://github.com/json-schema-tools/dereferencer/commit/64b11411be83c5658d7bb67815a47946c6ce144d))
+* tests passing now ([8979faa](https://github.com/json-schema-tools/dereferencer/commit/8979faae59990b611c7894923e1a6ba646281c46))
+* update deps ([e480e35](https://github.com/json-schema-tools/dereferencer/commit/e480e35630a3b76d551c5e35853bdd0d20547a60))
+* update readme ([aef5e13](https://github.com/json-schema-tools/dereferencer/commit/aef5e13ae3b2401eb7192365a94e7bbf634d3dd1))
+
 ## [1.0.7](https://github.com/json-schema-tools/dereferencer/compare/1.0.6...1.0.7) (2020-07-01)
 
 
