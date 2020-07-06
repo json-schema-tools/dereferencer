@@ -159,6 +159,21 @@ export class InvalidFileSystemPathError extends Error {
 }
 
 /**
+ * Error thrown when given an invalid file system path as a reference.
+ *
+ */
+export class InvalidRemoteURLError extends Error {
+  constructor(ref: string) {
+    super(
+      [
+        "InvalidRemoteURLError",
+        `The url was not resolvable: ${ref}`,
+      ].join("\n"),
+    );
+  }
+}
+
+/**
  * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
  * No references are fetched until .resolve is called.
  */
@@ -186,34 +201,49 @@ export class Dereferencer {
   public async resolve(): Promise<JSONMetaSchema> {
     const refMap: { [s: string]: JSONMetaSchema } = {};
 
-    if (this.refs.length === 0) { return this.schema; }
+    if (this.refs.length === 0) { return Promise.resolve(this.schema); }
 
-    console.log(this.refs); // tslint:disable-line
     for (const ref of this.refs) {
+      console.log('resolve:: fetching Ref'); // tslint:disable-line
       const fetched = await this.fetchRef(ref);
 
-      console.log('finished fetching refs'); // tslint:disable-line
+      console.log('resolve:: finished fetching refs'); // tslint:disable-line
       if (this.options.recursive === true && ref[0] !== "#") {
         // might want to reconsider the class interface... lol
 
         console.log('creating new dereffer'); // tslint:disable-line
         const subDereffer = new Dereferencer(fetched, this.options);
-        const subFetched = await subDereffer.resolve();
         console.log('finished resolving subrefs'); // tslint:disable-line
-        refMap[ref] = subFetched;
+        refMap[ref] = await subDereffer.resolve();
       } else {
         refMap[ref] = fetched;
       }
     }
 
-    await Promise.all(Object.values(refMap));
+    console.log('replacing references with refMap:', refMap); // tslint:disable-line
 
-    traverse(this.schema, (s) => {
-      if (s.$ref !== undefined) {
-        return refMap[s.$ref];
-      }
-      return s;
-    }, { mutable: true });
+    // replace refs with their recurivesly resolved counterparts
+    // fails when the root is replaced, ends up having no effect. so handle that case first.
+    if (this.schema.$ref !== undefined) {
+      this.schema = refMap[this.schema.$ref];
+    } else {
+      traverse(this.schema, (s) => {
+        if (s.$ref !== undefined) {
+          return refMap[s.$ref];
+        }
+        return s;
+      }, { mutable: true });
+      // might be able to get away iwth something like:
+      // this.schema = traverse(this.schema, (s) => {
+      //   if (s.$ref !== undefined) {
+      //     return refMap[s.$ref];
+      //   }
+      //   return s;
+      // }, { mutable: true });
+      //  /// allthough this really depends on mutability of incoming schema...
+    }
+
+    console.log('replaced references', this.schema); // tslint:disable-line
 
     if (this.options.recursive === true) {
       this.refs = this.collectRefs();
@@ -224,7 +254,7 @@ export class Dereferencer {
     }
   }
 
-  private async fetchRef(ref: string): Promise<JSONMetaSchema> {
+  public async fetchRef(ref: string): Promise<JSONMetaSchema> {
     if (this.refCache[ref] !== undefined) {
       return this.refCache[ref];
     }
@@ -235,9 +265,11 @@ export class Dereferencer {
         const pointer = Ptr.parse(withoutHash);
         const reffedSchema = pointer.eval(this.schema);
 
-        if (reffedSchema.$ref !== undefined) {
-          return this.fetchRef(reffedSchema.$ref);
-        }
+        // if (reffedSchema.$ref !== undefined) {
+        //   const subFetched = await this.fetchRef(reffedSchema.$ref);
+        //   this.refCache[ref] = reffedSchema;
+        //   return subFetched;
+        // }
 
         this.refCache[ref] = reffedSchema;
         return Promise.resolve(reffedSchema);
@@ -249,6 +281,7 @@ export class Dereferencer {
     // handle file references
 
     if (await fileExistsAndReadable(ref) === true) {
+      console.log("fetchRef:: reading file"); // tslint:disable-line
       const fileContents = await readFile(ref);
       let reffedSchema;
       try {
@@ -261,7 +294,9 @@ export class Dereferencer {
       // (todo when we have validator)
 
       // return it
-      this.refCache[ref] = reffedSchema;
+      this.refCache[ref] = await reffedSchema;
+
+      console.log("fetchRef:: finished reading file"); // tslint:disable-line
       return reffedSchema;
     } else if (["$", ".", "/"].indexOf(ref[0]) !== -1) {
       // there is good reason to assume this was intended to be a file path, but it was
@@ -271,34 +306,26 @@ export class Dereferencer {
 
     // handle http/https uri references
     // this forms the base case. We use node-fetch (or injected fetch lib) and let r rip
+    let rs;
+    console.log("fetchRef:: fetching url"); // tslint:disable-line
     try {
-      console.log("fetching url"); // tslint:disable-line
-      const fetchResult = await fetch(ref);
-      console.log("fetch success"); // tslint:disable-line
-      try {
-        console.log("parsing fetched result to json"); // tslint:disable-line
-        const reffedSchema = await fetchResult.json();
-        console.log("json parsing complete"); // tslint:disable-line
-
-        this.refCache[ref] = reffedSchema;
-
-        console.log("fetched url", reffedSchema); // tslint:disable-line
-        return reffedSchema;
-      } catch (e) {
-        console.log("found big ol json parse error", e); // tslint:disable-line
-        throw new NonJsonRefError({ $ref: ref }, await fetchResult.text());
-      }
+      rs = fetch(ref).then((r) => r.json());
     } catch (e) {
-      console.log("found fetch error", e); // tslint:disable-line
-      throw new Error("Unhandled ref");
+      console.error("Unable to fetch ref");
+      throw new InvalidRemoteURLError(ref);
     }
+    console.log(`fetchRef:: finished fetching url: ${ref}`); //tslint:disable-line
+
+    this.refCache[ref] = await rs;
+
+    return rs;
   }
 
   /**
    * First-pass traversal to collect all the refs that we can find. This allows us to
    * optimize the async work required as well.
    */
-  private collectRefs(): string[] {
+  public collectRefs(): string[] {
     const refs: string[] = [];
 
     traverse(this.schema, (s) => {

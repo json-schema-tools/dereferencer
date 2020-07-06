@@ -63,7 +63,9 @@ describe("Dereferencer", () => {
     const dereferencer = new Dereferencer({
       type: "object",
       properties: {
-        jsonSchemaMetaSchema: { $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json" },
+        jsonSchemaMetaSchema: {
+          $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json",
+        },
       },
     });
     const dereffed = await dereferencer.resolve();
@@ -74,12 +76,26 @@ describe("Dereferencer", () => {
     expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].type).toBe("integer");
   });
 
-  it.only("can deal with root refs", async () => {
+  it("can deal with root refs-to-ref as url", async () => {
+    expect.assertions(6);
     const dereferencer = new Dereferencer({
       $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json",
     });
     const dereffed = await dereferencer.resolve();
     expect(dereffed).toBeDefined();
+    expect(dereffed.type).toHaveLength(2);
+    expect(dereffed.type).toHaveLength(2);
+    expect(dereffed.type).toContain("object");
+    expect(dereffed.type).toContain("boolean");
+    expect((dereffed.properties as Properties).additionalItems).toBe(dereffed);
+  });
+
+  it("can deal with root refs-to-ref as file", async () => {
+    const dereferencer = new Dereferencer({
+      $ref: "./src/test-schema-1.json",
+    });
+    const { type } = await dereferencer.resolve();
+    expect(type).toBe("string");
   });
 
 });
