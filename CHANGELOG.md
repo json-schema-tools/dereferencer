@@ -1,3 +1,13 @@
+## [1.0.9](https://github.com/json-schema-tools/dereferencer/compare/1.0.8...1.0.9) (2020-07-06)
+
+
+### Bug Fixes
+
+* add test that infinite loops. bed time fuck this shit ([d269fe5](https://github.com/json-schema-tools/dereferencer/commit/d269fe5208082286bac97291492425294f142ef2))
+* pre-refactoring ([cf25929](https://github.com/json-schema-tools/dereferencer/commit/cf25929886e73d029f9cff22d6f1cd1cb55ea12a))
+* remove commented out garbage ([b2ede0a](https://github.com/json-schema-tools/dereferencer/commit/b2ede0a312009473ceeec1511adcb6a2a25536c0))
+* tests passing but logs after tests finish still somehow ([06f2a07](https://github.com/json-schema-tools/dereferencer/commit/06f2a077771b0610884573cfa734e796a797b15b))
+
 ## [1.0.8](https://github.com/json-schema-tools/dereferencer/compare/1.0.7...1.0.8) (2020-07-03)
 
 
