@@ -97,5 +97,4 @@ describe("Dereferencer", () => {
     const { type } = await dereferencer.resolve();
     expect(type).toBe("string");
   });
-
 });

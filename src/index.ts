@@ -7,15 +7,16 @@ import * as path from "path";
 
 const fileExistsAndReadable = (f: string): Promise<boolean> => {
   return new Promise((resolve) => {
-    fs.access(f, fs.constants.F_OK | fs.constants.R_OK, (e) => { //tslint:disable-line
+    return fs.access(f, fs.constants.F_OK | fs.constants.R_OK, (e) => { //tslint:disable-line
       if (e) { return resolve(false); }
-      resolve(true);
+      return resolve(true);
     });
   });
 };
+
 const readFile = (f: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    fs.readFile(f, "utf8", (err, data) => {
+    return fs.readFile(f, "utf8", (err, data) => {
       if (err) {
         return reject(err);
       }
@@ -187,7 +188,6 @@ export class Dereferencer {
     // this.schema = { ...schema }; // start by making a shallow copy.
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
-    console.log("refs collected: ", this.refs); // tslint:disable-line
   }
 
   /**
@@ -201,26 +201,26 @@ export class Dereferencer {
   public async resolve(): Promise<JSONMetaSchema> {
     const refMap: { [s: string]: JSONMetaSchema } = {};
 
-    if (this.refs.length === 0) { return Promise.resolve(this.schema); }
+    if (this.refs.length === 0) {
+      return Promise.resolve(this.schema);
+    }
 
+    const proms = [];
     for (const ref of this.refs) {
-      console.log('resolve:: fetching Ref'); // tslint:disable-line
-      const fetched = await this.fetchRef(ref);
+      const fetched = this.fetchRef(ref);
+      proms.push(fetched);
 
-      console.log('resolve:: finished fetching refs'); // tslint:disable-line
       if (this.options.recursive === true && ref[0] !== "#") {
         // might want to reconsider the class interface... lol
 
-        console.log('creating new dereffer'); // tslint:disable-line
-        const subDereffer = new Dereferencer(fetched, this.options);
-        console.log('finished resolving subrefs'); // tslint:disable-line
-        refMap[ref] = await subDereffer.resolve();
+        const subDereffer = new Dereferencer(await fetched, this.options);
+        const subFetched = subDereffer.resolve();
+        proms.push(subFetched);
+        refMap[ref] = await subFetched;
       } else {
-        refMap[ref] = fetched;
+        refMap[ref] = await fetched;
       }
     }
-
-    console.log('replacing references with refMap:', refMap); // tslint:disable-line
 
     // replace refs with their recurivesly resolved counterparts
     // fails when the root is replaced, ends up having no effect. so handle that case first.
@@ -243,20 +243,18 @@ export class Dereferencer {
       //  /// allthough this really depends on mutability of incoming schema...
     }
 
-    console.log('replaced references', this.schema); // tslint:disable-line
-
     if (this.options.recursive === true) {
       this.refs = this.collectRefs();
-
-      return this.resolve();
-    } else {
-      return this.schema;
+      const recurseResolve = this.resolve();
+      proms.push(recurseResolve);
     }
+
+    return Promise.all(proms).then(() => this.schema);
   }
 
   public async fetchRef(ref: string): Promise<JSONMetaSchema> {
     if (this.refCache[ref] !== undefined) {
-      return this.refCache[ref];
+      return Promise.resolve(this.refCache[ref]);
     }
 
     if (ref[0] === "#") {
@@ -281,7 +279,6 @@ export class Dereferencer {
     // handle file references
 
     if (await fileExistsAndReadable(ref) === true) {
-      console.log("fetchRef:: reading file"); // tslint:disable-line
       const fileContents = await readFile(ref);
       let reffedSchema;
       try {
@@ -294,11 +291,10 @@ export class Dereferencer {
       // (todo when we have validator)
 
       // return it
-      this.refCache[ref] = await reffedSchema;
+      this.refCache[ref] = reffedSchema;
 
-      console.log("fetchRef:: finished reading file"); // tslint:disable-line
       return reffedSchema;
-    } else if (["$", ".", "/"].indexOf(ref[0]) !== -1) {
+    } else if (["$", ".", "/", ".."].indexOf(ref[0]) !== -1) {
       // there is good reason to assume this was intended to be a file path, but it was
       // not resolvable. In this case we should give a good error message.
       throw new InvalidFileSystemPathError(ref);
@@ -307,14 +303,11 @@ export class Dereferencer {
     // handle http/https uri references
     // this forms the base case. We use node-fetch (or injected fetch lib) and let r rip
     let rs;
-    console.log("fetchRef:: fetching url"); // tslint:disable-line
     try {
       rs = fetch(ref).then((r) => r.json());
     } catch (e) {
-      console.error("Unable to fetch ref");
       throw new InvalidRemoteURLError(ref);
     }
-    console.log(`fetchRef:: finished fetching url: ${ref}`); //tslint:disable-line
 
     this.refCache[ref] = await rs;
 
