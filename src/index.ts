@@ -7,15 +7,16 @@ import * as path from "path";
 
 const fileExistsAndReadable = (f: string): Promise<boolean> => {
   return new Promise((resolve) => {
-    fs.access(f, fs.constants.F_OK | fs.constants.R_OK, (e) => { //tslint:disable-line
+    return fs.access(f, fs.constants.F_OK | fs.constants.R_OK, (e) => { //tslint:disable-line
       if (e) { return resolve(false); }
-      resolve(true);
+      return resolve(true);
     });
   });
 };
+
 const readFile = (f: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    fs.readFile(f, "utf8", (err, data) => {
+    return fs.readFile(f, "utf8", (err, data) => {
       if (err) {
         return reject(err);
       }
@@ -159,6 +160,21 @@ export class InvalidFileSystemPathError extends Error {
 }
 
 /**
+ * Error thrown when given an invalid file system path as a reference.
+ *
+ */
+export class InvalidRemoteURLError extends Error {
+  constructor(ref: string) {
+    super(
+      [
+        "InvalidRemoteURLError",
+        `The url was not resolvable: ${ref}`,
+      ].join("\n"),
+    );
+  }
+}
+
+/**
  * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
  * No references are fetched until .resolve is called.
  */
@@ -169,7 +185,6 @@ export class Dereferencer {
   private schema: JSONMetaSchema;
 
   constructor(schema: JSONMetaSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
-    // this.schema = { ...schema }; // start by making a shallow copy.
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
@@ -185,40 +200,49 @@ export class Dereferencer {
   public async resolve(): Promise<JSONMetaSchema> {
     const refMap: { [s: string]: JSONMetaSchema } = {};
 
-    if (this.refs.length === 0) { return this.schema; }
+    if (this.refs.length === 0) {
+      return Promise.resolve(this.schema);
+    }
 
+    const proms = [];
     for (const ref of this.refs) {
-      const fetched = await this.fetchRef(ref);
+      const fetched = this.fetchRef(ref);
+      proms.push(fetched);
 
       if (this.options.recursive === true && ref[0] !== "#") {
-        // might want to reconsider the class interface... lol
-        const subDereffer = new Dereferencer(fetched, this.options);
-        const subFetched = await subDereffer.resolve();
-        refMap[ref] = subFetched;
+
+        const subDereffer = new Dereferencer(await fetched, this.options);
+        const subFetched = subDereffer.resolve();
+        proms.push(subFetched);
+        refMap[ref] = await subFetched;
       } else {
-        refMap[ref] = fetched;
+        refMap[ref] = await fetched;
       }
     }
 
-    traverse(this.schema, (s) => {
-      if (s.$ref !== undefined) {
-        return refMap[s.$ref];
-      }
-      return s;
-    }, { mutable: true });
+    if (this.schema.$ref !== undefined) {
+      this.schema = refMap[this.schema.$ref];
+    } else {
+      traverse(this.schema, (s) => {
+        if (s.$ref !== undefined) {
+          return refMap[s.$ref];
+        }
+        return s;
+      }, { mutable: true });
+    }
 
     if (this.options.recursive === true) {
       this.refs = this.collectRefs();
-
-      return this.resolve();
-    } else {
-      return this.schema;
+      const recurseResolve = this.resolve();
+      proms.push(recurseResolve);
     }
+
+    return Promise.all(proms).then(() => this.schema);
   }
 
-  private async fetchRef(ref: string): Promise<JSONMetaSchema> {
+  public async fetchRef(ref: string): Promise<JSONMetaSchema> {
     if (this.refCache[ref] !== undefined) {
-      return this.refCache[ref];
+      return Promise.resolve(this.refCache[ref]);
     }
 
     if (ref[0] === "#") {
@@ -227,18 +251,12 @@ export class Dereferencer {
         const pointer = Ptr.parse(withoutHash);
         const reffedSchema = pointer.eval(this.schema);
 
-        if (reffedSchema.$ref !== undefined) {
-          return this.fetchRef(reffedSchema.$ref);
-        }
-
         this.refCache[ref] = reffedSchema;
         return Promise.resolve(reffedSchema);
       } catch (e) {
         throw new InvalidJsonPointerRefError({ $ref: ref });
       }
     }
-
-    // handle file references
 
     if (await fileExistsAndReadable(ref) === true) {
       const fileContents = await readFile(ref);
@@ -248,41 +266,30 @@ export class Dereferencer {
       } catch (e) {
         throw new NonJsonRefError({ $ref: ref }, fileContents);
       }
-
-      // throw if not valid json schema
-      // (todo when we have validator)
-
-      // return it
       this.refCache[ref] = reffedSchema;
+
       return reffedSchema;
-    } else if (["$", ".", "/"].indexOf(ref[0]) !== -1) {
-      // there is good reason to assume this was intended to be a file path, but it was
-      // not resolvable. In this case we should give a good error message.
+    } else if (["$", ".", "/", ".."].indexOf(ref[0]) !== -1) {
       throw new InvalidFileSystemPathError(ref);
     }
 
-    // handle http/https uri references
-    // this forms the base case. We use node-fetch (or injected fetch lib) and let r rip
+    let rs;
     try {
-      const fetchResult = await fetch(ref);
-      try {
-        const reffedSchema = await fetchResult.json();
-
-        this.refCache[ref] = reffedSchema;
-        return reffedSchema;
-      } catch (e) {
-        throw new NonJsonRefError({ $ref: ref }, await fetchResult.text());
-      }
+      rs = fetch(ref).then((r) => r.json());
     } catch (e) {
-      throw new Error("Unhandled ref");
+      throw new InvalidRemoteURLError(ref);
     }
+
+    this.refCache[ref] = await rs;
+
+    return rs;
   }
 
   /**
    * First-pass traversal to collect all the refs that we can find. This allows us to
    * optimize the async work required as well.
    */
-  private collectRefs(): string[] {
+  public collectRefs(): string[] {
     const refs: string[] = [];
 
     traverse(this.schema, (s) => {
