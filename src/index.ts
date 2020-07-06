@@ -185,7 +185,6 @@ export class Dereferencer {
   private schema: JSONMetaSchema;
 
   constructor(schema: JSONMetaSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
-    // this.schema = { ...schema }; // start by making a shallow copy.
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
@@ -211,7 +210,6 @@ export class Dereferencer {
       proms.push(fetched);
 
       if (this.options.recursive === true && ref[0] !== "#") {
-        // might want to reconsider the class interface... lol
 
         const subDereffer = new Dereferencer(await fetched, this.options);
         const subFetched = subDereffer.resolve();
@@ -222,8 +220,6 @@ export class Dereferencer {
       }
     }
 
-    // replace refs with their recurivesly resolved counterparts
-    // fails when the root is replaced, ends up having no effect. so handle that case first.
     if (this.schema.$ref !== undefined) {
       this.schema = refMap[this.schema.$ref];
     } else {
@@ -233,14 +229,6 @@ export class Dereferencer {
         }
         return s;
       }, { mutable: true });
-      // might be able to get away iwth something like:
-      // this.schema = traverse(this.schema, (s) => {
-      //   if (s.$ref !== undefined) {
-      //     return refMap[s.$ref];
-      //   }
-      //   return s;
-      // }, { mutable: true });
-      //  /// allthough this really depends on mutability of incoming schema...
     }
 
     if (this.options.recursive === true) {
@@ -263,20 +251,12 @@ export class Dereferencer {
         const pointer = Ptr.parse(withoutHash);
         const reffedSchema = pointer.eval(this.schema);
 
-        // if (reffedSchema.$ref !== undefined) {
-        //   const subFetched = await this.fetchRef(reffedSchema.$ref);
-        //   this.refCache[ref] = reffedSchema;
-        //   return subFetched;
-        // }
-
         this.refCache[ref] = reffedSchema;
         return Promise.resolve(reffedSchema);
       } catch (e) {
         throw new InvalidJsonPointerRefError({ $ref: ref });
       }
     }
-
-    // handle file references
 
     if (await fileExistsAndReadable(ref) === true) {
       const fileContents = await readFile(ref);
@@ -286,22 +266,13 @@ export class Dereferencer {
       } catch (e) {
         throw new NonJsonRefError({ $ref: ref }, fileContents);
       }
-
-      // throw if not valid json schema
-      // (todo when we have validator)
-
-      // return it
       this.refCache[ref] = reffedSchema;
 
       return reffedSchema;
     } else if (["$", ".", "/", ".."].indexOf(ref[0]) !== -1) {
-      // there is good reason to assume this was intended to be a file path, but it was
-      // not resolvable. In this case we should give a good error message.
       throw new InvalidFileSystemPathError(ref);
     }
 
-    // handle http/https uri references
-    // this forms the base case. We use node-fetch (or injected fetch lib) and let r rip
     let rs;
     try {
       rs = fetch(ref).then((r) => r.json());
