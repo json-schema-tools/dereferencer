@@ -1,3 +1,10 @@
+## [1.0.10](https://github.com/json-schema-tools/dereferencer/compare/1.0.9...1.0.10) (2020-07-06)
+
+
+### Bug Fixes
+
+* gh-pages fixup ([b65d3da](https://github.com/json-schema-tools/dereferencer/commit/b65d3da8e09ee92ae7505e3f7a4edfadac2e3ba7))
+
 ## [1.0.9](https://github.com/json-schema-tools/dereferencer/compare/1.0.8...1.0.9) (2020-07-06)
 
 
