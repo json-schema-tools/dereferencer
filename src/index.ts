@@ -201,6 +201,7 @@ export class Dereferencer {
     const refMap: { [s: string]: JSONMetaSchema } = {};
 
     if (this.refs.length === 0) {
+      delete this.schema.definitions;
       return Promise.resolve(this.schema);
     }
 
