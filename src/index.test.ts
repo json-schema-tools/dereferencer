@@ -70,14 +70,19 @@ describe("Dereferencer", () => {
     });
     const dereffed = await dereferencer.resolve();
     const props = dereffed.properties as Properties;
-    expect(props.jsonSchemaMetaSchema.type).toBeDefined();
-    expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0).toBeDefined();
-    expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].$ref).toBeUndefined();
-    expect(props.jsonSchemaMetaSchema.definitions.nonNegativeIntegerDefault0.allOf[0].type).toBe("integer");
+    expect(props.jsonSchemaMetaSchema.type).toEqual(["object", "boolean"]);
+    expect(props.jsonSchemaMetaSchema.properties.maxLength.title)
+      .toBe("nonNegativeInteger");
+
+    expect(props.jsonSchemaMetaSchema.properties.minItems.title)
+      .toBe("nonNegativeIntegerDefaultZero");
+
+    expect(props.jsonSchemaMetaSchema.properties.dependencies.additionalProperties.anyOf[0])
+      .toBe(props.jsonSchemaMetaSchema);
   });
 
   it("can deal with root refs-to-ref as url", async () => {
-    expect.assertions(6);
+    expect.assertions(8);
     const dereferencer = new Dereferencer({
       $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json",
     });
@@ -88,6 +93,10 @@ describe("Dereferencer", () => {
     expect(dereffed.type).toContain("object");
     expect(dereffed.type).toContain("boolean");
     expect((dereffed.properties as Properties).additionalItems).toBe(dereffed);
+    expect(
+      (dereffed.properties as Properties).minProperties.title
+    ).toBe("nonNegativeIntegerDefaultZero");
+    expect(dereffed.definitions).toBeUndefined();
   });
 
   it("can deal with root refs-to-ref as file", async () => {
