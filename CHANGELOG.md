@@ -1,3 +1,10 @@
+## [1.0.13](https://github.com/json-schema-tools/dereferencer/compare/1.0.12...1.0.13) (2020-07-07)
+
+
+### Bug Fixes
+
+* remove definitions key after dereffing ([ed43c3f](https://github.com/json-schema-tools/dereferencer/commit/ed43c3f8f36d83a576713f1300e8b91d65ae9e59))
+
 ## [1.0.12](https://github.com/json-schema-tools/dereferencer/compare/1.0.11...1.0.12) (2020-07-07)
 
 
