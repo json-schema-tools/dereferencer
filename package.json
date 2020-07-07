@@ -15,7 +15,6 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@json-schema-tools/meta-schema": "^1.0.10",
-    "@json-schema-tools/traverse": "^1.2.3",
     "@types/jest": "^26.0.3",
     "@types/node": "^14.0.14",
     "@types/node-fetch": "^2.5.7",
@@ -27,6 +26,7 @@
   },
   "dependencies": {
     "@json-schema-spec/json-pointer": "^0.1.2",
+    "@json-schema-tools/traverse": "^1.2.4",
     "node-fetch": "^2.6.0"
   }
 }
