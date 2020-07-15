@@ -1,3 +1,10 @@
+## [1.0.14](https://github.com/json-schema-tools/dereferencer/compare/1.0.13...1.0.14) (2020-07-15)
+
+
+### Bug Fixes
+
+* update to new traverse ([45ab188](https://github.com/json-schema-tools/dereferencer/commit/45ab188e5cab557e84c9cc588e0d60d64f822ddf))
+
 ## [1.0.13](https://github.com/json-schema-tools/dereferencer/compare/1.0.12...1.0.13) (2020-07-07)
 
 
