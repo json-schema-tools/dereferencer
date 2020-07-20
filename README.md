@@ -2,7 +2,10 @@
 
 Otherwise known as a ref parser, this tool will replace json schema using $ref with the underlying reference, returning relevant errors otherwise.
 
-features:
+Built using @json-schema-tools/traverse
+
+## features
+
 - minimal dependencies
 - simple & fast
 - cycle detection/handling
