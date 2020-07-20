@@ -1,3 +1,11 @@
+## [1.0.15](https://github.com/json-schema-tools/dereferencer/compare/1.0.14...1.0.15) (2020-07-20)
+
+
+### Bug Fixes
+
+* update docs ([2027221](https://github.com/json-schema-tools/dereferencer/commit/202722104d999aa096995762f240d11dc30080a7))
+* update to latest traverse ([ed5e95a](https://github.com/json-schema-tools/dereferencer/commit/ed5e95a164d9b4f708cf34ef8206b7e35f086b4b))
+
 ## [1.0.14](https://github.com/json-schema-tools/dereferencer/compare/1.0.13...1.0.14) (2020-07-15)
 
 
