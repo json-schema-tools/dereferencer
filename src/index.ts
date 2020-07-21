@@ -1,4 +1,4 @@
-import { JSONMetaSchema } from "@json-schema-tools/meta-schema";
+import { JSONSchema, JSONSchemaObject } from "@json-schema-tools/meta-schema";
 import traverse from "@json-schema-tools/traverse";
 import * as fs from "fs";
 import fetch from "node-fetch";
@@ -25,7 +25,7 @@ const readFile = (f: string): Promise<string> => {
   });
 };
 
-export interface RefCache { [k: string]: JSONMetaSchema; }
+export interface RefCache { [k: string]: JSONSchema; }
 
 /**
  * Options that can be passed to the derefencer constructor.
@@ -58,7 +58,7 @@ export const defaultDereferencerOptions: DereferencerOptions = {
  *
  */
 export class NonStringRefError extends Error {
-  constructor(schema: JSONMetaSchema) {
+  constructor(schema: JSONSchema) {
     let schemaString = "";
     try {
       schemaString = JSON.stringify(schema);
@@ -95,7 +95,7 @@ export class NonStringRefError extends Error {
  *
  */
 export class NonJsonRefError extends Error {
-  constructor(schema: JSONMetaSchema, nonJson: string) {
+  constructor(schema: JSONSchemaObject, nonJson: string) {
     super(
       [
         "NonJsonRefError",
@@ -122,7 +122,7 @@ export class NonJsonRefError extends Error {
  *
  */
 export class InvalidJsonPointerRefError extends Error {
-  constructor(schema: JSONMetaSchema) {
+  constructor(schema: JSONSchemaObject) {
     super(
       [
         "InvalidJsonPointerRefError",
@@ -182,9 +182,9 @@ export class Dereferencer {
 
   public refs: string[];
   private refCache: RefCache = {};
-  private schema: JSONMetaSchema;
+  private schema: JSONSchema;
 
-  constructor(schema: JSONMetaSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
+  constructor(schema: JSONSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
@@ -197,8 +197,12 @@ export class Dereferencer {
    *
    *
    */
-  public async resolve(): Promise<JSONMetaSchema> {
-    const refMap: { [s: string]: JSONMetaSchema } = {};
+  public async resolve(): Promise<JSONSchema> {
+    const refMap: { [s: string]: JSONSchema } = {};
+
+    if (this.schema === true || this.schema === false) {
+      return Promise.resolve(this.schema);
+    }
 
     if (this.refs.length === 0) {
       delete this.schema.definitions;
@@ -225,6 +229,9 @@ export class Dereferencer {
       this.schema = refMap[this.schema.$ref];
     } else {
       traverse(this.schema, (s) => {
+        if (s === true || s === false) {
+          return s;
+        }
         if (s.$ref !== undefined) {
           return refMap[s.$ref];
         }
@@ -241,7 +248,7 @@ export class Dereferencer {
     return Promise.all(proms).then(() => this.schema);
   }
 
-  public async fetchRef(ref: string): Promise<JSONMetaSchema> {
+  public async fetchRef(ref: string): Promise<JSONSchema> {
     if (this.refCache[ref] !== undefined) {
       return Promise.resolve(this.refCache[ref]);
     }
@@ -294,6 +301,9 @@ export class Dereferencer {
     const refs: string[] = [];
 
     traverse(this.schema, (s) => {
+      if (s === true || s === false) {
+        return s;
+      }
       if (s.$ref && refs.indexOf(s.$ref) === -1) {
         if (typeof s.$ref !== "string") {
           throw new NonStringRefError(s);
