@@ -1,5 +1,5 @@
 import Dereferencer from "./index";
-import { Properties } from "@json-schema-tools/meta-schema";
+import { Properties, JSONSchemaObject } from "@json-schema-tools/meta-schema";
 
 describe("Dereferencer", () => {
 
@@ -17,7 +17,7 @@ describe("Dereferencer", () => {
         fromFile: { $ref: "./src/test-schema.json" },
       },
     });
-    const dereffed = await dereferencer.resolve();
+    const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
     expect(props.fromFile).not.toBe(props.bar);
@@ -34,7 +34,7 @@ describe("Dereferencer", () => {
         baz: { $ref: "#/properties/bar" },
       },
     });
-    const dereffed = await dereferencer.resolve();
+    const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
     expect(props.baz).toBe(props.foo);
@@ -50,7 +50,7 @@ describe("Dereferencer", () => {
         baz: { $ref: "#/properties/bar" },
       },
     });
-    const dereffed = await dereferencer.resolve();
+    const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
     expect(props.baz).toBe(props.foo);
@@ -64,37 +64,43 @@ describe("Dereferencer", () => {
       type: "object",
       properties: {
         jsonSchemaMetaSchema: {
-          $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json",
+          $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/src/schema.json",
         },
       },
     });
-    const dereffed = await dereferencer.resolve();
+    const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     const props = dereffed.properties as Properties;
-    expect(props.jsonSchemaMetaSchema.type).toEqual(["object", "boolean"]);
-    expect(props.jsonSchemaMetaSchema.properties.maxLength.title)
+
+    const oneOfs = props.jsonSchemaMetaSchema.oneOf as JSONSchemaObject[];
+    expect(oneOfs).toBeInstanceOf(Array);
+
+    const oProp = oneOfs[0].properties as Properties;
+    expect(oProp.maxLength.title)
       .toBe("nonNegativeInteger");
 
-    expect(props.jsonSchemaMetaSchema.properties.minItems.title)
+    expect(oProp.minItems.title)
       .toBe("nonNegativeIntegerDefaultZero");
 
-    expect(props.jsonSchemaMetaSchema.properties.dependencies.additionalProperties.anyOf[0])
+    expect(oProp.dependencies.additionalProperties.anyOf[0])
       .toBe(props.jsonSchemaMetaSchema);
   });
 
   it("can deal with root refs-to-ref as url", async () => {
-    expect.assertions(8);
+    expect.assertions(7);
     const dereferencer = new Dereferencer({
-      $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json",
+      $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/src/schema.json",
     });
-    const dereffed = await dereferencer.resolve();
+    const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     expect(dereffed).toBeDefined();
-    expect(dereffed.type).toHaveLength(2);
-    expect(dereffed.type).toHaveLength(2);
-    expect(dereffed.type).toContain("object");
-    expect(dereffed.type).toContain("boolean");
-    expect((dereffed.properties as Properties).additionalItems).toBe(dereffed);
+    expect(dereffed.oneOf).toBeInstanceOf(Array);
+
+    const oneOfs = dereffed.oneOf as JSONSchemaObject[];
+
+    expect(oneOfs[0].type).toBe("object");
+    expect(oneOfs[1].type).toBe("boolean");
+    expect((oneOfs[0].properties as Properties).additionalItems).toBe(dereffed);
     expect(
-      (dereffed.properties as Properties).minProperties.title
+      (oneOfs[0].properties as Properties).minProperties.title
     ).toBe("nonNegativeIntegerDefaultZero");
     expect(dereffed.definitions).toBeUndefined();
   });
@@ -103,7 +109,7 @@ describe("Dereferencer", () => {
     const dereferencer = new Dereferencer({
       $ref: "./src/test-schema-1.json",
     });
-    const { type } = await dereferencer.resolve();
+    const { type } = await dereferencer.resolve() as JSONSchemaObject;
     expect(type).toBe("string");
   });
 });
