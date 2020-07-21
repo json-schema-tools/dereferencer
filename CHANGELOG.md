@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/json-schema-tools/dereferencer/compare/1.0.15...1.1.0) (2020-07-21)
+
+
+### Bug Fixes
+
+* remove hold ([df2f3bb](https://github.com/json-schema-tools/dereferencer/commit/df2f3bb325a112b11f21e0901511b48471c2b009))
+* update package json meta a little bit ([cb257fe](https://github.com/json-schema-tools/dereferencer/commit/cb257fe0dd9e5273c062fc5fb91b9896929c72ab))
+
+
+### Features
+
+* update to new meta schema and traverse ([b42fb4a](https://github.com/json-schema-tools/dereferencer/commit/b42fb4a82d32918f01c9a2631290923ec5c2c406))
+
 ## [1.0.15](https://github.com/json-schema-tools/dereferencer/compare/1.0.14...1.0.15) (2020-07-20)
 
 
