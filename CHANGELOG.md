@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/json-schema-tools/dereferencer/compare/1.1.0...1.2.0) (2020-07-22)
+
+
+### Features
+
+* isomorphic browser n node support ([0ef22b4](https://github.com/json-schema-tools/dereferencer/commit/0ef22b4687d3059f0cd68b142acff6e24a3f84cd))
+
 # [1.1.0](https://github.com/json-schema-tools/dereferencer/compare/1.0.15...1.1.0) (2020-07-21)
 
 
