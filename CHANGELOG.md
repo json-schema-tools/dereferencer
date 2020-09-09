@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/json-schema-tools/dereferencer/compare/1.2.1...1.2.2) (2020-09-09)
+
+
+### Bug Fixes
+
+* fs.constants updated for web ([0d3518e](https://github.com/json-schema-tools/dereferencer/commit/0d3518edac34de3cf7dc8f19baf123406e7669b9)), closes [#61](https://github.com/json-schema-tools/dereferencer/issues/61)
+
 ## [1.2.1](https://github.com/json-schema-tools/dereferencer/compare/1.2.0...1.2.1) (2020-07-28)
 
 
