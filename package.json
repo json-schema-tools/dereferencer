@@ -44,6 +44,6 @@
   "dependencies": {
     "@json-schema-spec/json-pointer": "^0.1.2",
     "@json-schema-tools/traverse": "^1.5.0",
-    "isomorphic-fetch": "^2.2.1"
+    "isomorphic-fetch": "^3.0.0"
   }
 }
