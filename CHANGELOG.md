@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/json-schema-tools/dereferencer/compare/1.2.4...1.2.5) (2020-10-17)
+
+
+### Bug Fixes
+
+* add badges to readme ([2568a79](https://github.com/json-schema-tools/dereferencer/commit/2568a795266f82c121d595517774168d31ea6580))
+
 ## [1.2.4](https://github.com/json-schema-tools/dereferencer/compare/1.2.3...1.2.4) (2020-10-17)
 
 
