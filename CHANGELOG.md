@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/json-schema-tools/dereferencer/compare/1.2.5...1.2.6) (2020-10-17)
+
+
+### Bug Fixes
+
+* update reference resolver to latest ([11e2862](https://github.com/json-schema-tools/dereferencer/commit/11e286214f553b742cb49979ab520947e61ef190))
+
 ## [1.2.5](https://github.com/json-schema-tools/dereferencer/compare/1.2.4...1.2.5) (2020-10-17)
 
 
