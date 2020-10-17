@@ -1,3 +1,15 @@
+## [1.2.3](https://github.com/json-schema-tools/dereferencer/compare/1.2.2...1.2.3) (2020-10-17)
+
+
+### Bug Fixes
+
+* add back refCache for cycle handling ([999f800](https://github.com/json-schema-tools/dereferencer/commit/999f8000d54fcdf2d2a38e826cf3d09fb3889a43))
+* bump typescript and node typings ([12ddcf8](https://github.com/json-schema-tools/dereferencer/commit/12ddcf842e04f51e3216a66c08aac4a86fdb75c0))
+* re-add jest types ([5b391e7](https://github.com/json-schema-tools/dereferencer/commit/5b391e7a28dcd5a6254621e594aa32044f5b31f2))
+* regen package-lock ([df17cfc](https://github.com/json-schema-tools/dereferencer/commit/df17cfcd5c5c8639e96765a17561bf13b68773cf))
+* use reference resolver package ([2ab425d](https://github.com/json-schema-tools/dereferencer/commit/2ab425db818962feff91873051a5457c2666d27f))
+* use safe stringify ([0509f87](https://github.com/json-schema-tools/dereferencer/commit/0509f87a92a1b9170e84e6674b66e5bf92cca9b7))
+
 ## [1.2.2](https://github.com/json-schema-tools/dereferencer/compare/1.2.1...1.2.2) (2020-09-09)
 
 
