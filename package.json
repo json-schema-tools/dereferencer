@@ -30,6 +30,7 @@
   ],
   "devDependencies": {
     "@json-schema-tools/meta-schema": "^1.4.0",
+    "@types/jest": "^26.0.14",
     "@types/node": "^14.0.14",
     "jest": "^24.8.0",
     "ts-jest": "^24.1.0",
