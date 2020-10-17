@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/json-schema-tools/dereferencer/compare/1.2.3...1.2.4) (2020-10-17)
+
+
+### Bug Fixes
+
+* update meta schema to latest ([b5b073b](https://github.com/json-schema-tools/dereferencer/commit/b5b073b7053d054d46381334ac70824125bd91ad))
+
 ## [1.2.3](https://github.com/json-schema-tools/dereferencer/compare/1.2.2...1.2.3) (2020-10-17)
 
 
