@@ -10,6 +10,7 @@ Built using @json-schema-tools/traverse
 - simple & fast
 - cycle detection/handling
 - switchable recusive dereferencing
+- works in node & in browser (isomorphic)
 - handles:
   - relative pointer refs
   - http/https uris
