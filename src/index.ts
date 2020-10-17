@@ -1,5 +1,9 @@
-import buildDereferencer from "./dereferencer";
-import fetch from "isomorphic-fetch";
-import * as fs from "fs";
+import dereffer from "./dereferencer";
 
-export default buildDereferencer(fetch, fs);
+export {
+  NonStringRefError,
+  DereferencerOptions,
+  defaultDereferencerOptions,
+} from "./dereferencer";
+
+export default dereffer;

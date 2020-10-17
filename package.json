@@ -11,9 +11,9 @@
     "build": "npm run build:code && typedoc --out docs &&  touch docs/.nojekyll",
     "build:code": "tsc",
     "lint": "tslint --fix -p .",
-    "test": "npm run test:unit && npm run test:web",
+    "test": "npm run test:unit",
     "test:unit": "npm run lint && jest --coverage",
-    "test:web": "npm run build:code && webpack && rm -rf dist"
+    "test:web": "npm run build:code"
   },
   "author": "BelfordZ<belfordz66@gmail.com>",
   "license": "Apache-2.0",
@@ -30,20 +30,17 @@
   ],
   "devDependencies": {
     "@json-schema-tools/meta-schema": "^1.4.0",
-    "@types/isomorphic-fetch": "0.0.35",
-    "@types/jest": "^26.0.3",
-    "@types/node": "^14.0.14",
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.11.10",
     "jest": "^24.8.0",
     "ts-jest": "^24.1.0",
     "tslint": "^6.1.2",
     "typedoc": "^0.19.1",
-    "typescript": "^4.0.2",
-    "webpack": "^4.31.0",
-    "webpack-cli": "^3.3.2"
+    "typescript": "^4.0.3"
   },
   "dependencies": {
-    "@json-schema-spec/json-pointer": "^0.1.2",
+    "@json-schema-tools/reference-resolver": "^1.0.0",
     "@json-schema-tools/traverse": "^1.5.0",
-    "isomorphic-fetch": "^2.2.1"
+    "fast-safe-stringify": "^2.0.7"
   }
 }
