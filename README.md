@@ -1,5 +1,16 @@
 # JSON Schema Dereferencer
 
+<center>
+  <span>
+    <img alt="CircleCI branch" src="https://img.shields.io/circleci/project/github/json-schema-tools/dereferencer/master.svg">
+    <img src="https://codecov.io/gh/json-schema-tools/dereferencer/branch/master/graph/badge.svg" />
+    <img alt="Dependabot status" src="https://api.dependabot.com/badges/status?host=github&repo=json-schema-tools/dereferencer" />
+    <img alt="npm" src="https://img.shields.io/npm/dt/@json-schema-tools/dereferencer.svg" />
+    <img alt="GitHub release" src="https://img.shields.io/github/release/json-schema-tools/dereferencer.svg" />
+    <img alt="GitHub commits since latest release" src="https://img.shields.io/github/commits-since/json-schema-tools/dereferencer/latest.svg" />
+  </span>
+</center>
+
 Otherwise known as a ref parser, this tool will replace json schema using $ref with the underlying reference, returning relevant errors otherwise.
 
 Built using @json-schema-tools/traverse
