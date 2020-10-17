@@ -1,10 +1,6 @@
 import dereffer from "./dereferencer";
 
 export {
-  InvalidFileSystemPathError,
-  InvalidJsonPointerRefError,
-  InvalidRemoteURLError,
-  NonJsonRefError,
   NonStringRefError,
   DereferencerOptions,
   defaultDereferencerOptions,

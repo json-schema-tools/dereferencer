@@ -1,7 +1,7 @@
-import { JSONSchema, JSONSchemaObject } from "@json-schema-tools/meta-schema";
+import { JSONSchema } from "@json-schema-tools/meta-schema";
 import traverse from "@json-schema-tools/traverse";
-import * as path from "path";
 import referenceResolver from "@json-schema-tools/reference-resolver";
+import safeStringify from "fast-safe-stringify";
 
 /**
  * Options that can be passed to the derefencer constructor.
@@ -34,117 +34,12 @@ export const defaultDereferencerOptions: DereferencerOptions = {
  *
  */
 export class NonStringRefError extends Error {
-  constructor(schema: JSONSchema) {
-    let schemaString = "";
-    try {
-      schemaString = JSON.stringify(schema);
-    } catch (e) {
-      schemaString = [
-        `Keys: ${Object.keys(schema)}`,
-        `Respective Values: ${Object.values(schema)}`,
-      ].join("\n");
-    }
+  constructor(s: JSONSchema) {
     super(
       [
         "NonStringRefError",
         "Found an improperly formatted $ref in schema. $ref must be a string",
-        `schema in question: ${schemaString}`,
-      ].join("\n"),
-    );
-  }
-}
-
-/**
- * Error thrown when the fetched reference is not properly formatted JSON or is encoded
- * incorrectly
- *
- * @example
- * ```typescript
- *
- * import Dereferencer, { NonJsonRefError } from "@json-schema-tools/dereferencer";
- * const dereffer = new Dereferencer({});
- * try { await dereffer.resolve(); }
- * catch(e) {
- *   if (e instanceof NonJsonRefError) { ... }
- * }
- * ```
- *
- */
-export class NonJsonRefError extends Error {
-  constructor(schema: JSONSchemaObject, nonJson: string) {
-    super(
-      [
-        "NonJsonRefError",
-        `The resolved value at the reference: ${schema.$ref} was not JSON.parse 'able`,
-        `The non-json content in question: ${nonJson}`,
-      ].join("\n"),
-    );
-  }
-}
-
-/**
- * Error thrown when a JSON pointer is provided but is not parseable as per the RFC6901
- *
- * @example
- * ```typescript
- *
- * import Dereferencer, { InvalidJsonPointerRefError } from "@json-schema-tools/dereferencer";
- * const dereffer = new Dereferencer({});
- * try { await dereffer.resolve(); }
- * catch(e) {
- *   if (e instanceof InvalidJsonPointerRefError) { ... }
- * }
- * ```
- *
- */
-export class InvalidJsonPointerRefError extends Error {
-  constructor(schema: JSONSchemaObject) {
-    super(
-      [
-        "InvalidJsonPointerRefError",
-        `The provided RFC6901 JSON Pointer is invalid: ${schema.$ref}`,
-      ].join("\n"),
-    );
-  }
-}
-
-/**
- * Error thrown when given an invalid file system path as a reference.
- *
- * @example
- * ```typescript
- *
- * import Dereferencer, { InvalidFileSystemPathError } from "@json-schema-tools/dereferencer";
- * const dereffer = new Dereferencer({});
- * try { await dereffer.resolve(); }
- * catch(e) {
- *   if (e instanceof InvalidFileSystemPathError) { ... }
- * }
- * ```
- *
- */
-export class InvalidFileSystemPathError extends Error {
-  constructor(ref: string) {
-    super(
-      [
-        "InvalidFileSystemPathError",
-        `The path was not resolvable: ${ref}`,
-        `resolved path: ${path.resolve(process.cwd(), ref)}`,
-      ].join("\n"),
-    );
-  }
-}
-
-/**
- * Error thrown when given an invalid file system path as a reference.
- *
- */
-export class InvalidRemoteURLError extends Error {
-  constructor(ref: string) {
-    super(
-      [
-        "InvalidRemoteURLError",
-        `The url was not resolvable: ${ref}`,
+        `schema in question: ${safeStringify(s)}`,
       ].join("\n"),
     );
   }
