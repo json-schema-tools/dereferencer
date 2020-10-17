@@ -45,6 +45,8 @@ export class NonStringRefError extends Error {
   }
 }
 
+export interface RefCache { [k: string]: JSONSchema; }
+
 /**
  * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
  * No references are fetched until .resolve is called.
@@ -52,6 +54,7 @@ export class NonStringRefError extends Error {
 export default class Dereferencer {
   public refs: string[];
   private schema: JSONSchema;
+  private refCache: RefCache = {};
 
   constructor(schema: JSONSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
     this.schema = schema; // shallow copy breaks recursive
@@ -80,11 +83,17 @@ export default class Dereferencer {
 
     const proms = [];
     for (const ref of this.refs) {
-      const fetched = await referenceResolver(ref, this.schema);
+      let fetched;
+      if (this.refCache[ref] !== undefined) {
+        fetched = this.refCache[ref];
+      } else {
+        fetched = await referenceResolver(ref, this.schema);
+        this.refCache[ref] = fetched;
+      }
+
       proms.push(fetched);
 
       if (this.options.recursive === true && ref[0] !== "#") {
-
         const subDereffer = new Dereferencer(await fetched, this.options);
         const subFetched = subDereffer.resolve();
         proms.push(subFetched);
