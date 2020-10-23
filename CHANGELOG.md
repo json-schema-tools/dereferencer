@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/json-schema-tools/dereferencer/compare/1.2.10...1.2.11) (2020-10-23)
+
+
+### Bug Fixes
+
+* update eslintrc ([ff85b47](https://github.com/json-schema-tools/dereferencer/commit/ff85b47093cefdb288770edfff6e53de346f1919))
+
 ## [1.2.10](https://github.com/json-schema-tools/dereferencer/compare/1.2.9...1.2.10) (2020-10-23)
 
 
