@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/json-schema-tools/dereferencer/compare/1.2.8...1.2.9) (2020-10-23)
+
+
+### Bug Fixes
+
+* add open collective ([b03b184](https://github.com/json-schema-tools/dereferencer/commit/b03b18491c94415e123bdfc1d59cf7a38a7258f4))
+
 ## [1.2.8](https://github.com/json-schema-tools/dereferencer/compare/1.2.7...1.2.8) (2020-10-23)
 
 
