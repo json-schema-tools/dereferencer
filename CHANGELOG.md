@@ -1,3 +1,10 @@
+## [1.2.8](https://github.com/json-schema-tools/dereferencer/compare/1.2.7...1.2.8) (2020-10-23)
+
+
+### Bug Fixes
+
+* update jest ([c612ce9](https://github.com/json-schema-tools/dereferencer/commit/c612ce9532819f026717a247bcca037f2b07fbf5))
+
 ## [1.2.7](https://github.com/json-schema-tools/dereferencer/compare/1.2.6...1.2.7) (2020-10-23)
 
 
