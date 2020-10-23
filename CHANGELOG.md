@@ -1,3 +1,11 @@
+## [1.2.7](https://github.com/json-schema-tools/dereferencer/compare/1.2.6...1.2.7) (2020-10-23)
+
+
+### Bug Fixes
+
+* add eslint dependency and workflow ([8ac862b](https://github.com/json-schema-tools/dereferencer/commit/8ac862b3692c11d61f12617b09ed5644431a7322))
+* setup eslint properly ([61cdec3](https://github.com/json-schema-tools/dereferencer/commit/61cdec3680253aa7d2c961c655ad27a0ef81584c))
+
 ## [1.2.6](https://github.com/json-schema-tools/dereferencer/compare/1.2.5...1.2.6) (2020-10-17)
 
 
