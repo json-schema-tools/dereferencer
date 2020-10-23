@@ -10,9 +10,9 @@
   "scripts": {
     "build": "npm run build:code && typedoc --out docs &&  touch docs/.nojekyll",
     "build:code": "tsc",
-    "lint": "tslint --fix -p .",
-    "test": "npm run test:unit",
-    "test:unit": "npm run lint && jest --coverage",
+    "lint": "eslint . --ext .ts",
+    "test": "npm run test:unit && npm run test:web",
+    "test:unit": "jest --coverage",
     "test:web": "npm run build:code"
   },
   "author": "BelfordZ<belfordz66@gmail.com>",
