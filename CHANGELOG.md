@@ -1,3 +1,10 @@
+## [1.2.10](https://github.com/json-schema-tools/dereferencer/compare/1.2.9...1.2.10) (2020-10-23)
+
+
+### Bug Fixes
+
+* oc name ([0d9d327](https://github.com/json-schema-tools/dereferencer/commit/0d9d3278b5f7303e573f038f3b20994ba8d5ca4f))
+
 ## [1.2.9](https://github.com/json-schema-tools/dereferencer/compare/1.2.8...1.2.9) (2020-10-23)
 
 
