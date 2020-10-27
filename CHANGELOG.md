@@ -1,3 +1,11 @@
+## [1.2.13](https://github.com/json-schema-tools/dereferencer/compare/1.2.12...1.2.13) (2020-10-27)
+
+
+### Bug Fixes
+
+* bump the rest of the deps ([b7fd392](https://github.com/json-schema-tools/dereferencer/commit/b7fd39243edab927c530d2b6e90a101b872540cf))
+* update deps ([49e624d](https://github.com/json-schema-tools/dereferencer/commit/49e624dd0d4e1cf1e271033e37e9382fbdecb5b4))
+
 ## [1.2.12](https://github.com/json-schema-tools/dereferencer/compare/1.2.11...1.2.12) (2020-10-27)
 
 
