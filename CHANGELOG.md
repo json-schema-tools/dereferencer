@@ -1,3 +1,10 @@
+## [1.2.12](https://github.com/json-schema-tools/dereferencer/compare/1.2.11...1.2.12) (2020-10-27)
+
+
+### Bug Fixes
+
+* remove unused browser field in package.json ([525d82b](https://github.com/json-schema-tools/dereferencer/commit/525d82bfd26deacabef08f0966a17961ff065400))
+
 ## [1.2.11](https://github.com/json-schema-tools/dereferencer/compare/1.2.10...1.2.11) (2020-10-23)
 
 
