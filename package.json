@@ -3,7 +3,6 @@
   "version": "0.0.0-development",
   "description": "Dereference (aka parse refs) from JSON Schemas",
   "main": "build/index.js",
-  "browser": "build/index-web.js",
   "publishConfig": {
     "access": "public"
   },
