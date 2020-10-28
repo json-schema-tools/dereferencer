@@ -1,3 +1,10 @@
+## [1.2.14](https://github.com/json-schema-tools/dereferencer/compare/1.2.13...1.2.14) (2020-10-28)
+
+
+### Bug Fixes
+
+* update ref resolver for browser build ([e4e062f](https://github.com/json-schema-tools/dereferencer/commit/e4e062f05d16f55930318a59eb3368f95a2a0e06))
+
 ## [1.2.13](https://github.com/json-schema-tools/dereferencer/compare/1.2.12...1.2.13) (2020-10-27)
 
 
