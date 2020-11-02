@@ -1,4 +1,4 @@
-import Dereferencer from "./index";
+import Dereferencer, { NonStringRefError } from "./index";
 import { Properties, JSONSchemaObject } from "@json-schema-tools/meta-schema";
 
 describe("Dereferencer", () => {
@@ -23,6 +23,42 @@ describe("Dereferencer", () => {
     expect(props.fromFile).not.toBe(props.bar);
     expect(props.fromFile).not.toBe(props.foo);
     expect(props.fromFile.type).toBe("string");
+  });
+
+  it("throws when the ref is not a string", () => {
+    expect.assertions(1);
+    try {
+      const dereferencer = new Dereferencer({
+        type: "object",
+        properties: {
+          bar: { $ref: 123 },
+        },
+      });
+    } catch (e) {
+      expect(e).toBeInstanceOf(NonStringRefError);
+    }
+  });
+
+  it("boolean schemas, nadda prawblem", async () => {
+    expect.assertions(1);
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        bar: { $ref: "#/definitions/leBool" },
+        foo: { $ref: "#/definitions/laBool" },
+      },
+      definitions: {
+        leBool: true,
+        laBool: false
+      }
+    });
+    expect(await dereferencer.resolve()).toEqual({
+      type: "object",
+      properties: {
+        bar: true,
+        foo: false
+      },
+    });
   });
 
   it("can ref other refs", async () => {
@@ -111,5 +147,24 @@ describe("Dereferencer", () => {
     });
     const { type } = await dereferencer.resolve() as JSONSchemaObject;
     expect(type).toBe("string");
+  });
+
+  it("can de-ref internal refs starting from the root and using keys other than defintions", async () => {
+    const dereferencer = new Dereferencer({
+      components: {
+        ProofNodes: {
+          type: "array",
+          items: {
+            $ref: "#/components/ProofNode"
+          }
+        },
+        ProofNode: {
+          type: "string"
+        },
+      },
+      $ref: "#/components/ProofNodes",
+    });
+    const { type } = await dereferencer.resolve() as JSONSchemaObject;
+    expect(type).toBe("array");
   });
 });
