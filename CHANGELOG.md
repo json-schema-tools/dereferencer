@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/json-schema-tools/dereferencer/compare/1.2.14...1.3.0) (2020-11-02)
+
+
+### Features
+
+* handle case with root schema as ref ([1cd02fc](https://github.com/json-schema-tools/dereferencer/commit/1cd02fca7f8dbc978d4c534c13e65015f298248e))
+
 ## [1.2.14](https://github.com/json-schema-tools/dereferencer/compare/1.2.13...1.2.14) (2020-10-28)
 
 
