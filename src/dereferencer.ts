@@ -1,4 +1,4 @@
-import { JSONSchema } from "@json-schema-tools/meta-schema";
+import { JSONSchema, JSONSchemaObject } from "@json-schema-tools/meta-schema";
 import traverse from "@json-schema-tools/traverse";
 import referenceResolver from "@json-schema-tools/reference-resolver";
 import safeStringify from "fast-safe-stringify";
@@ -33,15 +33,16 @@ export const defaultDereferencerOptions: DereferencerOptions = {
  * ```
  *
  */
-export class NonStringRefError extends Error {
+export class NonStringRefError implements Error {
+  public message: string;
+  public name = "NonStringRefError";
+
   constructor(s: JSONSchema) {
-    super(
-      [
-        "NonStringRefError",
-        "Found an improperly formatted $ref in schema. $ref must be a string",
-        `schema in question: ${safeStringify(s)}`,
-      ].join("\n"),
-    );
+    this.message = [
+      "NonStringRefError",
+      "Found an improperly formatted $ref in schema. $ref must be a string",
+      `schema in question: ${safeStringify(s)}`,
+    ].join("\n");
   }
 }
 
@@ -93,7 +94,7 @@ export default class Dereferencer {
 
       proms.push(fetched);
 
-      if (this.options.recursive === true && ref[0] !== "#") {
+      if (this.options.recursive === true && ref.charAt(0) !== "#") {
         const subDereffer = new Dereferencer(await fetched, this.options);
         const subFetched = subDereffer.resolve();
         proms.push(subFetched);
@@ -104,7 +105,17 @@ export default class Dereferencer {
     }
 
     if (this.schema.$ref !== undefined) {
-      this.schema = refMap[this.schema.$ref];
+      const rootRef = refMap[this.schema.$ref];
+      if (rootRef === true || rootRef === false) {
+        this.schema = rootRef;
+      } else {
+        const schemaCopy = { ...this.schema };
+        this.schema = rootRef;
+        Object
+          .entries(schemaCopy)
+          .filter(([k]) => k !== "$ref")
+          .forEach(([k, v]) => (this.schema as JSONSchemaObject)[k] = v);
+      }
     } else {
       traverse(this.schema, (s) => {
         if (s === true || s === false) {
