@@ -61,6 +61,21 @@ describe("Dereferencer", () => {
     });
   });
 
+  it("boolean schemas as root", async () => {
+    expect.assertions(1);
+    const dereferencer = new Dereferencer(true);
+    expect(await dereferencer.resolve()).toEqual(true);
+  });
+
+  it("boolean schema root ref", async () => {
+    expect.assertions(1);
+    const dereferencer = new Dereferencer({
+      $ref: "#/definitions/a",
+      definitions: { a: true }
+    });
+    expect(await dereferencer.resolve()).toEqual(true);
+  });
+
   it("can ref other refs", async () => {
     const dereferencer = new Dereferencer({
       type: "object",
@@ -151,20 +166,86 @@ describe("Dereferencer", () => {
 
   it("can de-ref internal refs starting from the root and using keys other than defintions", async () => {
     const dereferencer = new Dereferencer({
-      components: {
-        ProofNodes: {
+      definitions: {
+        a: {
           type: "array",
           items: {
-            $ref: "#/components/ProofNode"
+            $ref: "#/definitions/b"
           }
         },
-        ProofNode: {
+        b: {
           type: "string"
         },
       },
-      $ref: "#/components/ProofNodes",
+      $ref: "#/definitions/a",
     });
     const { type } = await dereferencer.resolve() as JSONSchemaObject;
     expect(type).toBe("array");
+  });
+
+  it("can use refs to fields other than 'definitions'", async () => {
+    const dereferencer = new Dereferencer({
+      components: {
+        a: {
+          type: "array",
+          items: {
+            $ref: "#/components/b"
+          }
+        },
+        b: {
+          type: "string"
+        },
+      },
+      $ref: "#/components/a",
+    });
+    const { type } = await dereferencer.resolve() as JSONSchemaObject;
+    expect(type).toBe("array");
+  });
+
+  it("handles overriding properties found in $refs", async () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        Bar: {
+          $ref: "#/definitions/Bar"
+        },
+        Baz: {
+          $ref: "#/definitions/Baz"
+        }
+      },
+      definitions: {
+        Bar: {
+          title: "bar",
+          $ref: "#/definitions/Baz",
+        },
+        Baz: {
+          type: "string",
+          title: "baz"
+        }
+      }
+    });
+    const r = await dereferencer.resolve() as JSONSchemaObject;
+    expect((r.properties as Properties).Bar.title).toBe("bar");
+  });
+
+  it("handles overriding properties found in $refs", async () => {
+    const dereferencer = new Dereferencer({
+      $ref: "#/definitions/a",
+      definitions: {
+        a: {
+          title: "bar",
+          $ref: "#/definitions/b",
+          description: "xyz"
+        },
+        b: {
+          title: "bar",
+          description: "abc",
+          type: "string"
+        }
+      }
+    });
+    const r = await dereferencer.resolve() as JSONSchemaObject;
+    expect(r.title).toBe("bar");
+    expect(r.description).toBe("xyz");
   });
 });

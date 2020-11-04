@@ -48,6 +48,13 @@ export class NonStringRefError implements Error {
 
 export interface RefCache { [k: string]: JSONSchema; }
 
+const copyProps = (s1: JSONSchemaObject, s2: JSONSchemaObject) => {
+  Object
+    .entries(s2)
+    .filter(([k]) => k !== "$ref")
+    .forEach(([k, v]) => s1[k] = v);
+};
+
 /**
  * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
  * No references are fetched until .resolve is called.
@@ -111,10 +118,7 @@ export default class Dereferencer {
       } else {
         const schemaCopy = { ...this.schema };
         this.schema = rootRef;
-        Object
-          .entries(schemaCopy)
-          .filter(([k]) => k !== "$ref")
-          .forEach(([k, v]) => (this.schema as JSONSchemaObject)[k] = v);
+        copyProps(this.schema, schemaCopy);
       }
     } else {
       traverse(this.schema, (s) => {
@@ -122,7 +126,13 @@ export default class Dereferencer {
           return s;
         }
         if (s.$ref !== undefined) {
-          return refMap[s.$ref];
+          const reffed = refMap[s.$ref];
+          if (reffed === true || reffed === false) {
+            return reffed;
+          } else {
+            copyProps(reffed, s);
+            return reffed;
+          }
         }
         return s;
       }, { mutable: true });
