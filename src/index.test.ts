@@ -167,4 +167,47 @@ describe("Dereferencer", () => {
     const { type } = await dereferencer.resolve() as JSONSchemaObject;
     expect(type).toBe("array");
   });
+
+  it("can handle oneof refs with types on it", async () => {
+    const dereferencer = new Dereferencer({
+      $ref: "#/components/BlockNumberOrTag",
+      components: {
+        BlockNumberOrTag: {
+          oneOf: [
+            {
+              $ref: "#/components/BlockNumber"
+            },
+            {
+              $ref: "#/components/BlockNumberTag"
+            }
+          ]
+        },
+        BlockNumber: {
+          $ref: "#/components/Integer",
+          description: "the hex represetnation of a blocks height",
+          title: "blockNumber",
+          type: "string",
+        },
+        Integer: {
+          type: "string",
+          pattern: "0x[a-fA-F0-9]$",
+          description: "integer hex",
+        },
+        BlockNumberTag: {
+          title: "blockNumberTag",
+          type: "string",
+          description: "the optional block height description",
+          enum: ["earliest", "latest", "pending"],
+        },
+        StorageProofKey: {
+          $ref: "#/components/Integer",
+          description: "The key used to get the storage slot in its account tree.",
+          title: "storageProofKey"
+        },
+      },
+    });
+    const r = await dereferencer.resolve() as JSONSchemaObject;
+    console.log("r=", r);
+    expect((r as any).oneOf[0].title).toBe("blockNumber");
+  });
 });
