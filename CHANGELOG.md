@@ -1,3 +1,11 @@
+## [1.3.1](https://github.com/json-schema-tools/dereferencer/compare/1.3.0...1.3.1) (2020-11-04)
+
+
+### Bug Fixes
+
+* add more tests and implement fix ([0f48a69](https://github.com/json-schema-tools/dereferencer/commit/0f48a69e9b94e7022612dc2f38ad8d2b586d11a7))
+* failing test for nested oneOf ref ([e6ad83c](https://github.com/json-schema-tools/dereferencer/commit/e6ad83c0df1d59d5c9cc3e89f4cda88367e6090f))
+
 # [1.3.0](https://github.com/json-schema-tools/dereferencer/compare/1.2.14...1.3.0) (2020-11-02)
 
 
