@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/json-schema-tools/dereferencer/compare/1.3.1...1.4.0) (2020-11-10)
+
+
+### Bug Fixes
+
+* remove console logs ([341a900](https://github.com/json-schema-tools/dereferencer/commit/341a9008e0f3d8c9176d74dd1d8397f9a2567ed5))
+* run lint with --fix ([24e51e6](https://github.com/json-schema-tools/dereferencer/commit/24e51e632fff550094c449a2cf57b9ecc30626d1))
+* tests and coverage all green now ([f265130](https://github.com/json-schema-tools/dereferencer/commit/f265130480d0c940618245e08693dfdaf37bb26a))
+
+
+### Features
+
+* refactor into something that will work for all the cases ([5ce57c0](https://github.com/json-schema-tools/dereferencer/commit/5ce57c06b3f8fb26222c3ffc4d92f32145010a84))
+
 ## [1.3.1](https://github.com/json-schema-tools/dereferencer/compare/1.3.0...1.3.1) (2020-11-04)
 
 
