@@ -8,6 +8,18 @@ describe("Dereferencer", () => {
     expect(dereferencer).toBeInstanceOf(Dereferencer);
   });
 
+  it("does nothing when there are no refs", async () => {
+    const test = {
+      type: "object",
+      properties: {
+        foo: { type: "string" }
+      }
+    };
+    const dereferencer = new Dereferencer(test);
+    const dereffed = await dereferencer.resolve();
+    expect(dereffed).toBe(test);
+  });
+
   it("simple dereffing", async () => {
     const dereferencer = new Dereferencer({
       type: "object",
@@ -29,7 +41,7 @@ describe("Dereferencer", () => {
   it("throws when the ref is not a string", () => {
     expect.assertions(1);
     try {
-      const dereferencer = new Dereferencer({
+      new Dereferencer({
         type: "object",
         properties: {
           bar: { $ref: 123 },
@@ -41,7 +53,6 @@ describe("Dereferencer", () => {
   });
 
   it("boolean schemas, nadda prawblem", async () => {
-    expect.assertions(1);
     const dereferencer = new Dereferencer({
       type: "object",
       properties: {
@@ -181,9 +192,7 @@ describe("Dereferencer", () => {
       $ref: "#/definitions/a",
     };
     const dereferencer = new Dereferencer(schema);
-    console.log(dereferencer.refs);
     const dereffedSchema = await dereferencer.resolve() as JSONSchemaObject;
-    console.log(dereffedSchema);
     expect(dereffedSchema.type).toBe("array");
     expect((dereffedSchema.items as JSONSchemaObject).title).toBe("b");
   });

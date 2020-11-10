@@ -65,13 +65,6 @@ const copyOrNot = (s1: JSONSchemaObject, s2: JSONSchema) => {
   }
 }
 
-const copyProps = (s1: JSONSchemaObject, s2: JSONSchemaObject) => {
-  Object
-    .entries(s2)
-    .filter(([k]) => k !== "$ref")
-    .forEach(([k, v]) => s1[k] = v);
-};
-
 /**
  * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
  * No references are fetched until .resolve is called.
@@ -111,7 +104,7 @@ export default class Dereferencer {
    *
    */
   public async resolve(): Promise<JSONSchema> {
-    console.log("Resolving started on: ", this.schema);
+    // console.log("Resolving started on: ", this.schema);
     const refMap: { [s: string]: JSONSchema } = {};
 
     if (this.schema === true || this.schema === false) {
@@ -119,57 +112,57 @@ export default class Dereferencer {
     }
 
     if (this.refs.length === 0) {
-      // delete this.schema.definitions;
       return Promise.resolve(this.schema);
     }
 
+    const unfetchedRefs = this.refs.filter((r) => refMap[r] === undefined);
+    // console.log("Looping over each ref:", unfetchedRefs);
+
     const proms = [];
-    for (const ref of this.refs) {
-      if (refMap[ref] === undefined) {
-        let fetched;
-        if (this.refCache[ref] !== undefined) {
-          console.log("Resolving from cache: ", ref, this.refCache[ref]);
-          fetched = this.refCache[ref];
-        } else {
-          const refProm = await referenceResolver(ref, this.options.rootSchema);
-          proms.push(refProm);
-          fetched = await refProm;
-          console.log("resolved:", fetched);
-        }
+    for (const ref of unfetchedRefs) {
+      // console.log("Processing: ", ref);
+      let fetched;
+      if (this.refCache[ref] !== undefined) {
+        // console.log("Resolving from cache: ", ref, this.refCache[ref]);
+        fetched = this.refCache[ref];
+      } else if (ref === "#") {
+        fetched = this.options.rootSchema;
+      } else {
+        const refProm = referenceResolver(ref, this.options.rootSchema);
+        proms.push(refProm);
+        fetched = await refProm;
+        // console.log("resolved:", fetched);
+      }
 
-        console.log("found reffed schema: ", ref, fetched);
+      // console.log("found reffed schema: ", ref, fetched);
 
-        if (this.options.recursive === true && fetched !== true && fetched !== false) {
-          const subDerefferOpts = {
-            ...this.options,
-            refCache: this.refCache,
-          };
-          console.log("bout to make subdereffer on:", fetched, subDerefferOpts);
+      if (this.options.recursive === true && fetched !== true && fetched !== false && ref !== "#") {
+        const subDerefferOpts = {
+          ...this.options,
+          refCache: this.refCache,
+        };
+        // console.log("bout to make subdereffer on:", fetched, subDerefferOpts);
 
-          if (fetched.$ref !== undefined && Object.keys(fetched).length > 1) {
-            console.log("BOOGER", fetched);
-          }
+        const subDereffer = new Dereferencer(fetched, subDerefferOpts);
+        // console.log("subdereffer found refs:", subDereffer.refs);
 
-          const subDereffer = new Dereferencer(fetched, subDerefferOpts);
-          console.log("subdereffer found refs:", subDereffer.refs);
+        if (subDereffer.refs.length !== 0) {
+          const subFetchedProm = subDereffer.resolve();
+          proms.push(subFetchedProm);
+          const subFetched = await subFetchedProm;
 
-          if (subDereffer.refs.length !== 0) {
-            const subFetchedProm = subDereffer.resolve();
-            const subFetched = await subFetchedProm;
-            proms.push(subFetchedProm);
-
-            // if there are props other than $ref present on the fetched schema,
-            // we have to break referential integrity, creating a new schema all together.
-            refMap[ref] = copyOrNot(fetched, subFetched);
-          } else {
-            refMap[ref] = fetched;
-          }
+          // if there are props other than $ref present on the fetched schema,
+          // we have to break referential integrity, creating a new schema all together.
+          refMap[ref] = copyOrNot(fetched, subFetched);
         } else {
           refMap[ref] = fetched;
         }
-        this.refCache[ref] = refMap[ref];
-        console.log("updated ref cache:", this.refCache);
+      } else {
+        refMap[ref] = fetched;
       }
+
+      this.refCache[ref] = refMap[ref];
+      // console.log("updated ref cache:", this.refCache);
     }
 
     if (this.schema.$ref !== undefined) {
@@ -221,28 +214,5 @@ export default class Dereferencer {
     });
 
     return refs;
-  }
-
-  private pluckInternalRefContainersOntoSchema(s: any) {
-    this.refs.forEach((ref) => {
-      const firstKeyInRefPath = ref.replace("#/", "").split("/")[0];
-      console.log("first key in path: ", firstKeyInRefPath);
-      if (s[firstKeyInRefPath] === undefined) {
-        s[firstKeyInRefPath] = (this.schema as any)[firstKeyInRefPath];
-      } else {
-        s[firstKeyInRefPath] = (this.schema as any)[firstKeyInRefPath];
-      }
-    });
-
-    return s;
-  }
-
-  private pluckInternalRefContainersOutOfSchema(s: any) {
-    console.log("removing:", this.refs, "from: ", s);
-    this.refs.forEach((ref) => {
-      const firstKeyInRefPath = ref.replace("#/", "").split("/")[0];
-      delete s[firstKeyInRefPath];
-    });
-    return s;
   }
 }
