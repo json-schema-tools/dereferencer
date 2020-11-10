@@ -89,6 +89,8 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="dereferenceroptions.html#recursive" class="tsd-kind-icon">recursive</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="dereferenceroptions.html#refcache" class="tsd-kind-icon">ref<wbr>Cache</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="dereferenceroptions.html#rootschema" class="tsd-kind-icon">root<wbr>Schema</a></li>
 							</ul>
 						</section>
 					</div>
@@ -102,7 +104,7 @@
 					<div class="tsd-signature tsd-kind-icon">recursive<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/d4dac00/src/dereferencer.ts#L13">dereferencer.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/fe155b6/src/dereferencer.ts#L14">dereferencer.ts:14</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -110,6 +112,31 @@
 							<p>If true, resolved non-local references will also be dereferenced using the same options.</p>
 						</div>
 					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="refcache" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ref<wbr>Cache</h3>
+					<div class="tsd-signature tsd-kind-icon">ref<wbr>Cache<span class="tsd-signature-symbol">:</span> <a href="refcache.html" class="tsd-signature-type">RefCache</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/fe155b6/src/dereferencer.ts#L18">dereferencer.ts:18</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Preseed the dereferencer with resolved refs</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="rootschema" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> root<wbr>Schema</h3>
+					<div class="tsd-signature tsd-kind-icon">root<wbr>Schema<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">JSONSchema</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/fe155b6/src/dereferencer.ts#L19">dereferencer.ts:19</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -136,6 +163,12 @@
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
 								<a href="dereferenceroptions.html#recursive" class="tsd-kind-icon">recursive</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="dereferenceroptions.html#refcache" class="tsd-kind-icon">ref<wbr>Cache</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="dereferenceroptions.html#rootschema" class="tsd-kind-icon">root<wbr>Schema</a>
 							</li>
 						</ul>
 					</li>
