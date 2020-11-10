@@ -3,6 +3,7 @@ import traverse from "@json-schema-tools/traverse";
 import referenceResolver from "@json-schema-tools/reference-resolver";
 import safeStringify from "fast-safe-stringify";
 
+export interface RefCache { [k: string]: JSONSchema; }
 /**
  * Options that can be passed to the derefencer constructor.
  */
@@ -11,11 +12,12 @@ export interface DereferencerOptions {
    * If true, resolved non-local references will also be dereferenced using the same options.
    */
   recursive?: boolean;
+  /**
+   * Preseed the dereferencer with resolved refs
+   */
+  refCache?: RefCache;
+  rootSchema?: JSONSchema;
 }
-
-export const defaultDereferencerOptions: DereferencerOptions = {
-  recursive: true,
-};
 
 /**
  * Error thrown by the constructor when given a ref that isn't a string
@@ -46,7 +48,22 @@ export class NonStringRefError implements Error {
   }
 }
 
-export interface RefCache { [k: string]: JSONSchema; }
+const copyOrNot = (s1: JSONSchemaObject, s2: JSONSchema) => {
+  if (
+    s1.$ref !== undefined &&
+    Object.keys(s1).length > 1 &&
+    (s2 !== true && s2 !== false)
+  ) {
+    const reflessCopy = {
+      ...s2,
+      ...s1
+    };
+    delete reflessCopy.$ref;
+    return reflessCopy;
+  } else {
+    return s2;
+  }
+}
 
 const copyProps = (s1: JSONSchemaObject, s2: JSONSchemaObject) => {
   Object
@@ -62,9 +79,25 @@ const copyProps = (s1: JSONSchemaObject, s2: JSONSchemaObject) => {
 export default class Dereferencer {
   public refs: string[];
   private schema: JSONSchema;
-  private refCache: RefCache = {};
+  public refCache: RefCache = {};
 
-  constructor(schema: JSONSchema, private options: DereferencerOptions = defaultDereferencerOptions) {
+  constructor(schema: JSONSchema, private options: DereferencerOptions = {}) {
+    if (this.options.recursive === undefined) {
+      this.options.recursive = true;
+    }
+
+    if (this.options.rootSchema === undefined) {
+      this.options.rootSchema = schema;
+    }
+
+    if (schema !== true && schema !== false && schema.$id) {
+      this.options.rootSchema = schema;
+    }
+
+    if (this.options.refCache) {
+      this.refCache = this.options.refCache;
+    }
+
     this.schema = schema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
@@ -78,6 +111,7 @@ export default class Dereferencer {
    *
    */
   public async resolve(): Promise<JSONSchema> {
+    console.log("Resolving started on: ", this.schema);
     const refMap: { [s: string]: JSONSchema } = {};
 
     if (this.schema === true || this.schema === false) {
@@ -85,66 +119,84 @@ export default class Dereferencer {
     }
 
     if (this.refs.length === 0) {
-      delete this.schema.definitions;
+      // delete this.schema.definitions;
       return Promise.resolve(this.schema);
     }
 
     const proms = [];
     for (const ref of this.refs) {
-      let fetched;
-      if (this.refCache[ref] !== undefined) {
-        fetched = this.refCache[ref];
-      } else {
-        fetched = await referenceResolver(ref, this.schema);
-        this.refCache[ref] = fetched;
-      }
+      if (refMap[ref] === undefined) {
+        let fetched;
+        if (this.refCache[ref] !== undefined) {
+          console.log("Resolving from cache: ", ref, this.refCache[ref]);
+          fetched = this.refCache[ref];
+        } else {
+          const refProm = await referenceResolver(ref, this.options.rootSchema);
+          proms.push(refProm);
+          fetched = await refProm;
+          console.log("resolved:", fetched);
+        }
 
-      proms.push(fetched);
+        console.log("found reffed schema: ", ref, fetched);
 
-      if (this.options.recursive === true && ref.charAt(0) !== "#") {
-        const subDereffer = new Dereferencer(await fetched, this.options);
-        const subFetched = subDereffer.resolve();
-        proms.push(subFetched);
-        refMap[ref] = await subFetched;
-      } else {
-        refMap[ref] = await fetched;
+        if (this.options.recursive === true && fetched !== true && fetched !== false) {
+          const subDerefferOpts = {
+            ...this.options,
+            refCache: this.refCache,
+          };
+          console.log("bout to make subdereffer on:", fetched, subDerefferOpts);
+
+          if (fetched.$ref !== undefined && Object.keys(fetched).length > 1) {
+            console.log("BOOGER", fetched);
+          }
+
+          const subDereffer = new Dereferencer(fetched, subDerefferOpts);
+          console.log("subdereffer found refs:", subDereffer.refs);
+
+          if (subDereffer.refs.length !== 0) {
+            const subFetchedProm = subDereffer.resolve();
+            const subFetched = await subFetchedProm;
+            proms.push(subFetchedProm);
+
+            // if there are props other than $ref present on the fetched schema,
+            // we have to break referential integrity, creating a new schema all together.
+            refMap[ref] = copyOrNot(fetched, subFetched);
+          } else {
+            refMap[ref] = fetched;
+          }
+        } else {
+          refMap[ref] = fetched;
+        }
+        this.refCache[ref] = refMap[ref];
+        console.log("updated ref cache:", this.refCache);
       }
     }
 
     if (this.schema.$ref !== undefined) {
-      const rootRef = refMap[this.schema.$ref];
-      if (rootRef === true || rootRef === false) {
-        this.schema = rootRef;
-      } else {
-        const schemaCopy = { ...this.schema };
-        this.schema = rootRef;
-        copyProps(this.schema, schemaCopy);
-      }
+      this.schema = copyOrNot(this.schema, refMap[this.schema.$ref]);
     } else {
       traverse(this.schema, (s) => {
         if (s === true || s === false) {
           return s;
         }
         if (s.$ref !== undefined) {
-          const reffed = refMap[s.$ref];
-          if (reffed === true || reffed === false) {
-            return reffed;
-          } else {
-            copyProps(reffed, s);
-            return reffed;
-          }
+          const reffedSchema = refMap[s.$ref];
+          return copyOrNot(s, reffedSchema);
         }
         return s;
       }, { mutable: true });
     }
 
-    if (this.options.recursive === true) {
-      this.refs = this.collectRefs();
-      const recurseResolve = this.resolve();
-      proms.push(recurseResolve);
-    }
-
-    return Promise.all(proms).then(() => this.schema);
+    return Promise
+      .all(proms)
+      .then(() => {
+        if (this.schema !== false && this.schema !== true) { // while not required, makes it nicer.
+          delete this.schema.definitions;
+          delete this.schema.components;
+        }
+        return this.schema
+      });
+    // .then(() => this.pluckInternalRefContainersOutOfSchema(this.schema));
   }
 
   /**
@@ -169,5 +221,28 @@ export default class Dereferencer {
     });
 
     return refs;
+  }
+
+  private pluckInternalRefContainersOntoSchema(s: any) {
+    this.refs.forEach((ref) => {
+      const firstKeyInRefPath = ref.replace("#/", "").split("/")[0];
+      console.log("first key in path: ", firstKeyInRefPath);
+      if (s[firstKeyInRefPath] === undefined) {
+        s[firstKeyInRefPath] = (this.schema as any)[firstKeyInRefPath];
+      } else {
+        s[firstKeyInRefPath] = (this.schema as any)[firstKeyInRefPath];
+      }
+    });
+
+    return s;
+  }
+
+  private pluckInternalRefContainersOutOfSchema(s: any) {
+    console.log("removing:", this.refs, "from: ", s);
+    this.refs.forEach((ref) => {
+      const firstKeyInRefPath = ref.replace("#/", "").split("/")[0];
+      delete s[firstKeyInRefPath];
+    });
+    return s;
   }
 }
