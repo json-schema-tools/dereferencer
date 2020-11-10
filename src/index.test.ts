@@ -8,6 +8,18 @@ describe("Dereferencer", () => {
     expect(dereferencer).toBeInstanceOf(Dereferencer);
   });
 
+  it("does nothing when there are no refs", async () => {
+    const test = {
+      type: "object",
+      properties: {
+        foo: { type: "string" }
+      }
+    };
+    const dereferencer = new Dereferencer(test);
+    const dereffed = await dereferencer.resolve();
+    expect(dereffed).toBe(test);
+  });
+
   it("simple dereffing", async () => {
     const dereferencer = new Dereferencer({
       type: "object",
@@ -17,6 +29,7 @@ describe("Dereferencer", () => {
         fromFile: { $ref: "./src/test-schema.json" },
       },
     });
+
     const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     const props = dereffed.properties as Properties;
     expect(props.bar).toBe(props.foo);
@@ -28,7 +41,7 @@ describe("Dereferencer", () => {
   it("throws when the ref is not a string", () => {
     expect.assertions(1);
     try {
-      const dereferencer = new Dereferencer({
+      new Dereferencer({
         type: "object",
         properties: {
           bar: { $ref: 123 },
@@ -40,7 +53,6 @@ describe("Dereferencer", () => {
   });
 
   it("boolean schemas, nadda prawblem", async () => {
-    expect.assertions(1);
     const dereferencer = new Dereferencer({
       type: "object",
       properties: {
@@ -110,12 +122,11 @@ describe("Dereferencer", () => {
   });
 
   it("can handle recursively dereffing", async () => {
-    expect.assertions(4);
     const dereferencer = new Dereferencer({
       type: "object",
       properties: {
         jsonSchemaMetaSchema: {
-          $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/src/schema.json",
+          $ref: "https://meta.json-schema.tools",
         },
       },
     });
@@ -139,7 +150,7 @@ describe("Dereferencer", () => {
   it("can deal with root refs-to-ref as url", async () => {
     expect.assertions(7);
     const dereferencer = new Dereferencer({
-      $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/src/schema.json",
+      $ref: "https://meta.json-schema.tools",
     });
     const dereffed = await dereferencer.resolve() as JSONSchemaObject;
     expect(dereffed).toBeDefined();
@@ -164,8 +175,8 @@ describe("Dereferencer", () => {
     expect(type).toBe("string");
   });
 
-  it("can de-ref internal refs starting from the root and using keys other than defintions", async () => {
-    const dereferencer = new Dereferencer({
+  it("can de-ref internal refs starting from the root", async () => {
+    const schema = {
       definitions: {
         a: {
           type: "array",
@@ -174,13 +185,16 @@ describe("Dereferencer", () => {
           }
         },
         b: {
+          title: "b",
           type: "string"
         },
       },
       $ref: "#/definitions/a",
-    });
-    const { type } = await dereferencer.resolve() as JSONSchemaObject;
-    expect(type).toBe("array");
+    };
+    const dereferencer = new Dereferencer(schema);
+    const dereffedSchema = await dereferencer.resolve() as JSONSchemaObject;
+    expect(dereffedSchema.type).toBe("array");
+    expect((dereffedSchema.items as JSONSchemaObject).title).toBe("b");
   });
 
   it("can use refs to fields other than 'definitions'", async () => {
@@ -193,20 +207,23 @@ describe("Dereferencer", () => {
           }
         },
         b: {
+          title: "b",
           type: "string"
         },
       },
       $ref: "#/components/a",
     });
-    const { type } = await dereferencer.resolve() as JSONSchemaObject;
-    expect(type).toBe("array");
+    const s = await dereferencer.resolve() as JSONSchemaObject;
+    expect(s.type).toBe("array");
+    expect((s.items as JSONSchemaObject).title).toBe("b");
   });
 
-  it("handles overriding properties found in $refs", async () => {
+  it("handles overriding properties found in $refs prop ordering doesnt matter", async () => {
     const dereferencer = new Dereferencer({
       type: "object",
       properties: {
         Bar: {
+          title: "bar",
           $ref: "#/definitions/Bar"
         },
         Baz: {
@@ -235,17 +252,16 @@ describe("Dereferencer", () => {
         a: {
           title: "bar",
           $ref: "#/definitions/b",
-          description: "xyz"
         },
         b: {
-          title: "bar",
+          title: "baz",
           description: "abc",
           type: "string"
         }
       }
     });
     const r = await dereferencer.resolve() as JSONSchemaObject;
+    expect(r.description).toBe("abc");
     expect(r.title).toBe("bar");
-    expect(r.description).toBe("xyz");
   });
 });
