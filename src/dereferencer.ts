@@ -104,7 +104,6 @@ export default class Dereferencer {
    *
    */
   public async resolve(): Promise<JSONSchema> {
-    // console.log("Resolving started on: ", this.schema);
     const refMap: { [s: string]: JSONSchema } = {};
 
     if (this.schema === true || this.schema === false) {
@@ -116,14 +115,11 @@ export default class Dereferencer {
     }
 
     const unfetchedRefs = this.refs.filter((r) => refMap[r] === undefined);
-    // console.log("Looping over each ref:", unfetchedRefs);
 
     const proms = [];
     for (const ref of unfetchedRefs) {
-      // console.log("Processing: ", ref);
       let fetched;
       if (this.refCache[ref] !== undefined) {
-        // console.log("Resolving from cache: ", ref, this.refCache[ref]);
         fetched = this.refCache[ref];
       } else if (ref === "#") {
         fetched = this.options.rootSchema;
@@ -131,20 +127,15 @@ export default class Dereferencer {
         const refProm = referenceResolver(ref, this.options.rootSchema);
         proms.push(refProm);
         fetched = await refProm;
-        // console.log("resolved:", fetched);
       }
-
-      // console.log("found reffed schema: ", ref, fetched);
 
       if (this.options.recursive === true && fetched !== true && fetched !== false && ref !== "#") {
         const subDerefferOpts = {
           ...this.options,
           refCache: this.refCache,
         };
-        // console.log("bout to make subdereffer on:", fetched, subDerefferOpts);
 
         const subDereffer = new Dereferencer(fetched, subDerefferOpts);
-        // console.log("subdereffer found refs:", subDereffer.refs);
 
         if (subDereffer.refs.length !== 0) {
           const subFetchedProm = subDereffer.resolve();
@@ -162,7 +153,6 @@ export default class Dereferencer {
       }
 
       this.refCache[ref] = refMap[ref];
-      // console.log("updated ref cache:", this.refCache);
     }
 
     if (this.schema.$ref !== undefined) {
@@ -189,7 +179,6 @@ export default class Dereferencer {
         }
         return this.schema
       });
-    // .then(() => this.pluckInternalRefContainersOutOfSchema(this.schema));
   }
 
   /**
