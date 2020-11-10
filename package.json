@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npm run build:code && typedoc --out docs &&  touch docs/.nojekyll",
     "build:code": "tsc",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts --fix",
     "test": "npm run test:unit && npm run test:web",
     "test:unit": "jest --coverage",
     "test:web": "npm run build:code"
