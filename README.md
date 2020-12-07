@@ -64,8 +64,8 @@ const mySchema = {
 
 const dereferencer = new JsonSchemaDereferencer(mySchema);
 
-console.log(derefencer.resolveSync());
-console.log(await derefencer.resolve());
+console.log(dereferencer.resolveSync());
+console.log(await dereferencer.resolve());
 ```
 
 ### Contributing
