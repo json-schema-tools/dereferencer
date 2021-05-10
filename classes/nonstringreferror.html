@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for @json-schema-tools/dereferencer">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -40,8 +41,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -53,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../globals.html">Globals</a>
+					<a href="../modules.html">@json-schema-tools/dereferencer</a>
 				</li>
 				<li>
 					<a href="nonstringreferror.html">NonStringRefError</a>
@@ -74,12 +73,13 @@
 					<dl class="tsd-comment-tags">
 						<dt>example</dt>
 						<dd><pre><code class="language-typescript">
-<span class="hljs-keyword">import</span> Dereferencer, { NonStringRefError } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@json-schema-tools/dereferencer&quot;</span>;
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Dereferencer</span><span style="color: #000000">, { </span><span style="color: #001080">NonStringRefError</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@json-schema-tools/dereferencer&quot;</span><span style="color: #000000">;</span>
 
-<span class="hljs-keyword">try</span> { <span class="hljs-keyword">const</span> dereffer = <span class="hljs-keyword">new</span> Dereferencer({}); }
-<span class="hljs-keyword">catch</span>(e) {
-  <span class="hljs-keyword">if</span> (e <span class="hljs-keyword">instanceof</span> NonStringRefError) { ... }
-}</code></pre>
+<span style="color: #AF00DB">try</span><span style="color: #000000"> { </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">dereffer</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Dereferencer</span><span style="color: #000000">({}); }</span>
+<span style="color: #AF00DB">catch</span><span style="color: #000000">(</span><span style="color: #001080">e</span><span style="color: #000000">) {</span>
+<span style="color: #000000">  </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">e</span><span style="color: #000000"> </span><span style="color: #0000FF">instanceof</span><span style="color: #000000"> </span><span style="color: #267F99">NonStringRefError</span><span style="color: #000000">) { ... }</span>
+<span style="color: #000000">}</span>
+</code></pre>
 						</dd>
 					</dl>
 				</div>
@@ -102,35 +102,35 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-external">
+						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="nonstringreferror.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="nonstringreferror.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-external">
+						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="nonstringreferror.html#message" class="tsd-kind-icon">message</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="nonstringreferror.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="nonstringreferror.html#message" class="tsd-kind-icon">message</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="nonstringreferror.html#name" class="tsd-kind-icon">name</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Non<wbr>String<wbr>Ref<wbr>Error<span class="tsd-signature-symbol">(</span>s<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">JSONSchema</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="nonstringreferror.html" class="tsd-signature-type">NonStringRefError</a></li>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Non<wbr>String<wbr>Ref<wbr>Error<span class="tsd-signature-symbol">(</span>s<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">JSONSchema</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="nonstringreferror.html" class="tsd-signature-type" data-tsd-kind="Class">NonStringRefError</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/e9c5d2c/src/dereferencer.ts#L45">dereferencer.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/a790d71/src/dereferencer.ts#L45">dereferencer.ts:45</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -139,30 +139,32 @@
 									<h5>s: <span class="tsd-signature-type">JSONSchema</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="nonstringreferror.html" class="tsd-signature-type">NonStringRefError</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="nonstringreferror.html" class="tsd-signature-type" data-tsd-kind="Class">NonStringRefError</a></h4>
 						</li>
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-external">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="message" class="tsd-anchor"></a>
 					<h3>message</h3>
 					<div class="tsd-signature tsd-kind-icon">message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
+						<p>Implementation of Error.message</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/e9c5d2c/src/dereferencer.ts#L44">dereferencer.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/a790d71/src/dereferencer.ts#L44">dereferencer.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-external">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="name" class="tsd-anchor"></a>
 					<h3>name</h3>
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;NonStringRefError&quot;</span></div>
 					<aside class="tsd-sources">
+						<p>Implementation of Error.name</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/e9c5d2c/src/dereferencer.ts#L45">dereferencer.ts:45</a></li>
+							<li>Defined in <a href="https://github.com/json-schema-tools/dereferencer/blob/a790d71/src/dereferencer.ts#L45">dereferencer.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -171,35 +173,32 @@
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="../globals.html"><em>Globals</em></a>
+					<li class=" ">
+						<a href="../modules.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="dereferencer.html" class="tsd-kind-icon">Dereferencer</a>
-					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-is-external">
+					<li class="current tsd-kind-class">
 						<a href="nonstringreferror.html" class="tsd-kind-icon">Non<wbr>String<wbr>Ref<wbr>Error</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="nonstringreferror.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-external">
+							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="nonstringreferror.html#message" class="tsd-kind-icon">message</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-external">
+							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="nonstringreferror.html#name" class="tsd-kind-icon">name</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="../interfaces/dereferenceroptions.html" class="tsd-kind-icon">Dereferencer<wbr>Options</a>
 					</li>
 				</ul>
@@ -211,6 +210,17 @@
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+			</ul>
 		</div>
 	</div>
 </footer>
