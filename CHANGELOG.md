@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/json-schema-tools/dereferencer/compare/1.4.2...1.5.0) (2021-05-10)
+
+
+### Bug Fixes
+
+* update to latest reference-resolver ([a238336](https://github.com/json-schema-tools/dereferencer/commit/a2383361c2b2aac2078ac854a71ba8ff0188ba75))
+
+
+### Features
+
+* add custom protocol handling ([593b400](https://github.com/json-schema-tools/dereferencer/commit/593b4009e9f0724c03a798ccf9f319db647ab68b))
+
 ## [1.4.2](https://github.com/json-schema-tools/dereferencer/compare/1.4.1...1.4.2) (2021-05-10)
 
 
