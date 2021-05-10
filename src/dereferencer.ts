@@ -122,11 +122,14 @@ export default class Dereferencer {
       if (this.refCache[ref] !== undefined) {
         fetched = this.refCache[ref];
       } else if (ref === "#") {
+        if (this.options.rootSchema === undefined) {
+          throw new Error("options.rootSchema was not provided, but one of the schemas references '#'");
+        }
         fetched = this.options.rootSchema;
       } else {
-        const refProm = referenceResolver(ref, this.options.rootSchema);
+        const refProm = referenceResolver.resolve(ref, this.options.rootSchema);
         proms.push(refProm);
-        fetched = await refProm;
+        fetched = await refProm as JSONSchema;
       }
 
       if (this.options.recursive === true && fetched !== true && fetched !== false && ref !== "#") {
