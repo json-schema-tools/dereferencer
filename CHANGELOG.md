@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/json-schema-tools/dereferencer/compare/1.5.0...1.5.1) (2021-05-10)
+
+
+### Bug Fixes
+
+* big node module bumps ([b56079c](https://github.com/json-schema-tools/dereferencer/commit/b56079c7cf5e69dd2e49df64c644bc9a0fd3c30c))
+
 # [1.5.0](https://github.com/json-schema-tools/dereferencer/compare/1.4.2...1.5.0) (2021-05-10)
 
 
