@@ -1,3 +1,17 @@
+## [1.4.2](https://github.com/json-schema-tools/dereferencer/compare/1.4.1...1.4.2) (2021-05-10)
+
+
+### Bug Fixes
+
+* **README:** typos ([20fe284](https://github.com/json-schema-tools/dereferencer/commit/20fe2849b53a118d1fc5b9a09805b4f075571fe9))
+
+## [1.4.1](https://github.com/json-schema-tools/dereferencer/compare/1.4.0...1.4.1) (2021-05-10)
+
+
+### Bug Fixes
+
+* gh action for linting ([62f27a7](https://github.com/json-schema-tools/dereferencer/commit/62f27a73c854b7a7befb72bd7306e4b7068c72c1))
+
 # [1.4.0](https://github.com/json-schema-tools/dereferencer/compare/1.3.1...1.4.0) (2020-11-10)
 
 
