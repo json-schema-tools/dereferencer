@@ -2,6 +2,7 @@ import { JSONSchema, JSONSchemaObject } from "@json-schema-tools/meta-schema";
 import traverse from "@json-schema-tools/traverse";
 import referenceResolver from "@json-schema-tools/reference-resolver";
 import safeStringify from "fast-safe-stringify";
+import { ProtocolHandlerMap } from "@json-schema-tools/reference-resolver/build/reference-resolver";
 
 export interface RefCache { [k: string]: JSONSchema; }
 /**
@@ -17,6 +18,10 @@ export interface DereferencerOptions {
    */
   refCache?: RefCache;
   rootSchema?: JSONSchema;
+  /**
+   * Setup custom protocol handlers. See https://github.com/json-schema-tools/reference-resolver for details
+   */
+  protocolHandlerMap?: ProtocolHandlerMap;
 }
 
 /**
@@ -89,6 +94,12 @@ export default class Dereferencer {
 
     if (this.options.refCache) {
       this.refCache = this.options.refCache;
+    }
+
+    if (this.options.protocolHandlerMap) {
+      for (const k of Object.keys(this.options.protocolHandlerMap)) {
+        referenceResolver.protocolHandlerMap[k] = this.options.protocolHandlerMap[k];
+      }
     }
 
     this.schema = schema; // shallow copy breaks recursive

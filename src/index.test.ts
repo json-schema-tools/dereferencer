@@ -265,3 +265,19 @@ describe("Dereferencer", () => {
     expect(r.title).toBe("bar");
   });
 });
+
+
+describe("custom protocol handling", () => {
+
+  it("can accept protocol handler options", async () => {
+    const ref = "ipfs://123456789";
+    const dereferencer = new Dereferencer({ $ref: ref }, {
+      protocolHandlerMap: {
+        ipfs: (ref) => Promise.resolve({ type: "string", title: ref })
+      }
+    });
+    const r = await dereferencer.resolve() as JSONSchemaObject;
+
+    expect(r.title).toBe(ref)
+  });
+});
