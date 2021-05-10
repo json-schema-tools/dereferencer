@@ -1,7 +1,6 @@
 {
   "name": "@json-schema-tools/dereferencer",
-  "mode": "file",
-  "inputFiles": [
+  "entryPoints": [
     "./src/index.ts"
   ],
   "out": "docs",
