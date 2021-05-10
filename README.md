@@ -51,7 +51,7 @@ const mySchema = {
       ]},
       bar: { $ref: "#/properties/foo" },
       baz: { $ref: "../myschemas/baz.json" },
-      jsonSchemaMetaSchema: { $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/meta-schema.json" }
+      jsonSchemaMetaSchema: { $ref: "https://meta.json-schema.tools" }
     },
     additionalProperties: {
         type: "array",
@@ -67,6 +67,29 @@ const dereferencer = new JsonSchemaDereferencer(mySchema);
 console.log(dereferencer.resolveSync());
 console.log(await dereferencer.resolve());
 ```
+
+
+### Add custom protocol handling
+
+```typescript
+import JsonSchemaDereferencer from "@json-schema-tools/dereferencer";
+
+const mySchema = {
+    type: "object",
+    properties: {
+      foo: { $ref: "ipfs://39420398420384" }
+    }
+};
+
+const dereferencer = new JsonSchemaDereferencer(mySchema, {
+  protocolHandlerMap: {
+    "ipfs": (ref) => Promise.resolve({ type: "string", title: "pretend we got this from ipfs" })
+});
+
+console.log(dereferencer.resolveSync());
+console.log(await dereferencer.resolve());
+```
+
 
 ### Contributing
 
