@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/json-schema-tools/dereferencer/compare/1.4.1...1.4.2) (2021-05-10)
+
+
+### Bug Fixes
+
+* **README:** typos ([20fe284](https://github.com/json-schema-tools/dereferencer/commit/20fe2849b53a118d1fc5b9a09805b4f075571fe9))
+
 ## [1.4.1](https://github.com/json-schema-tools/dereferencer/compare/1.4.0...1.4.1) (2021-05-10)
 
 
