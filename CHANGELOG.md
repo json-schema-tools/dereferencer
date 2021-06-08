@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/json-schema-tools/dereferencer/compare/1.5.1...1.5.2) (2021-06-08)
+
+
+### Bug Fixes
+
+* update deps ([e4a1a9b](https://github.com/json-schema-tools/dereferencer/commit/e4a1a9b2438e2e84e13a82cb6dd80f805764bd9f))
+
 ## [1.5.1](https://github.com/json-schema-tools/dereferencer/compare/1.5.0...1.5.1) (2021-05-10)
 
 
