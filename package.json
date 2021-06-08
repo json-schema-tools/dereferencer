@@ -28,20 +28,20 @@
     "!build/**/*.test.*"
   ],
   "devDependencies": {
-    "@json-schema-tools/meta-schema": "^1.5.9",
+    "@json-schema-tools/meta-schema": "^1.6.10",
     "@types/jest": "^26.0.15",
-    "@types/node": "^14.14.5",
-    "@typescript-eslint/eslint-plugin": "^4.6.0",
-    "@typescript-eslint/parser": "^4.6.0",
-    "eslint": "^7.12.1",
+    "@types/node": "^14.17.3",
+    "@typescript-eslint/eslint-plugin": "^4.26.1",
+    "@typescript-eslint/parser": "^4.26.1",
+    "eslint": "^7.28.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.3.0",
     "typedoc": "^0.20.36",
-    "typescript": "^4.0.5"
+    "typescript": "4.2.4"
   },
   "dependencies": {
-    "@json-schema-tools/reference-resolver": "^1.2.1",
-    "@json-schema-tools/traverse": "^1.7.5",
+    "@json-schema-tools/reference-resolver": "^1.2.2",
+    "@json-schema-tools/traverse": "^1.7.8",
     "fast-safe-stringify": "^2.0.7"
   }
 }
