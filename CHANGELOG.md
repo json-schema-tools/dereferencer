@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/json-schema-tools/dereferencer/compare/1.5.2...1.5.3) (2021-06-24)
+
+
+### Bug Fixes
+
+* update to new meta-schema ([fab77bc](https://github.com/json-schema-tools/dereferencer/commit/fab77bc6e540a81284400d183c98571212fba1ec))
+
 ## [1.5.2](https://github.com/json-schema-tools/dereferencer/compare/1.5.1...1.5.2) (2021-06-08)
 
 
