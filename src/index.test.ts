@@ -1,5 +1,5 @@
 import Dereferencer, { NonStringRefError } from "./index";
-import { Properties, JSONSchemaObject } from "@json-schema-tools/meta-schema";
+import { Properties, JSONSchemaObject, JSONSchema } from "@json-schema-tools/meta-schema";
 
 describe("Dereferencer", () => {
 
@@ -14,7 +14,7 @@ describe("Dereferencer", () => {
       properties: {
         foo: { type: "string" }
       }
-    };
+    } as JSONSchema;
     const dereferencer = new Dereferencer(test);
     const dereffed = await dereferencer.resolve();
     expect(dereffed).toBe(test);
