@@ -1,3 +1,11 @@
+## [1.5.4](https://github.com/json-schema-tools/dereferencer/compare/1.5.3...1.5.4) (2022-03-18)
+
+
+### Bug Fixes
+
+* bump version and respect relative path ([db93727](https://github.com/json-schema-tools/dereferencer/commit/db93727579af564f02f5551b0c272f0cc28731dd))
+* ci version bump ([7d22690](https://github.com/json-schema-tools/dereferencer/commit/7d22690f68f2e68ba287670d577cb1cf1f936d16))
+
 ## [1.5.3](https://github.com/json-schema-tools/dereferencer/compare/1.5.2...1.5.3) (2021-06-24)
 
 
