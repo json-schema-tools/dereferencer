@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/json-schema-tools/dereferencer/compare/1.5.4...1.5.5) (2022-06-29)
+
+
+### Bug Fixes
+
+* update dependabot settings ([954f058](https://github.com/json-schema-tools/dereferencer/commit/954f058fdf705f8296f43970321180b017601cf7))
+
 ## [1.5.4](https://github.com/json-schema-tools/dereferencer/compare/1.5.3...1.5.4) (2022-03-18)
 
 
