@@ -11,13 +11,5 @@
     "build",
     "jest.config.js",
     "src/*.test.ts"
-  ],
-  "toc": [
-    "Dereferencer",
-    "DereferencerOptions",
-    "InvalidFileSystemPathError",
-    "InvalidJsonPointerRefError",
-    "NonJsonRefError",
-    "NonStringRefError"
   ]
 }
