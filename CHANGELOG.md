@@ -1,3 +1,12 @@
+## [1.5.7](https://github.com/json-schema-tools/dereferencer/compare/1.5.6...1.5.7) (2022-10-05)
+
+
+### Bug Fixes
+
+* gh action for linting is broken ([14bff9b](https://github.com/json-schema-tools/dereferencer/commit/14bff9bec2c10b854ee1bad2dbeebb96fce3d6e0))
+* lint fix ([aebeed8](https://github.com/json-schema-tools/dereferencer/commit/aebeed8574cc250019688544c549c0042f5c80a1))
+* remove refMap and fix infinite looping case ([6c0c5b8](https://github.com/json-schema-tools/dereferencer/commit/6c0c5b83055972a30de3b83f41fc36c7d28d7480))
+
 ## [1.5.6](https://github.com/json-schema-tools/dereferencer/compare/1.5.5...1.5.6) (2022-10-05)
 
 
