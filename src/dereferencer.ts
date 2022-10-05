@@ -115,8 +115,13 @@ export default class Dereferencer {
    *
    */
   public async resolve(): Promise<JSONSchema> {
-    const refMap: { [s: string]: JSONSchema } = {};
+    await this._resolve();
+    delete (this.schema as any).definitions;
+    delete (this.schema as any).components;
+    return this.schema;
+  }
 
+  public async _resolve(): Promise<JSONSchema> {
     if (this.schema === true || this.schema === false) {
       return Promise.resolve(this.schema);
     }
@@ -124,8 +129,7 @@ export default class Dereferencer {
     if (this.refs.length === 0) {
       return Promise.resolve(this.schema);
     }
-
-    const unfetchedRefs = this.refs.filter((r) => refMap[r] === undefined);
+    const unfetchedRefs = this.refs.filter((r) => this.refCache[r] === undefined);
 
     const proms = [];
     for (const ref of unfetchedRefs) {
@@ -150,49 +154,36 @@ export default class Dereferencer {
         };
 
         const subDereffer = new Dereferencer(fetched, subDerefferOpts);
-
         if (subDereffer.refs.length !== 0) {
-          const subFetchedProm = subDereffer.resolve();
+          const subFetchedProm = subDereffer._resolve();
           proms.push(subFetchedProm);
           const subFetched = await subFetchedProm;
-
-          // if there are props other than $ref present on the fetched schema,
-          // we have to break referential integrity, creating a new schema all together.
-          refMap[ref] = copyOrNot(fetched, subFetched);
+          this.refCache[ref] = copyOrNot(fetched, subFetched);
         } else {
-          refMap[ref] = fetched;
+          this.refCache[ref] = fetched;
         }
       } else {
-        refMap[ref] = fetched;
+        this.refCache[ref] = fetched;
       }
-
-      this.refCache[ref] = refMap[ref];
     }
 
     if (this.schema.$ref !== undefined) {
-      this.schema = copyOrNot(this.schema, refMap[this.schema.$ref]);
+      this.schema = copyOrNot(this.schema, this.refCache[this.schema.$ref]);
     } else {
       traverse(this.schema, (s) => {
         if (s === true || s === false) {
           return s;
         }
         if (s.$ref !== undefined) {
-          const reffedSchema = refMap[s.$ref];
+          const reffedSchema = this.refCache[s.$ref];
           return copyOrNot(s, reffedSchema);
         }
         return s;
       }, { mutable: true });
     }
 
-    return Promise
-      .all(proms)
-      .then(() => {
-        if (this.schema !== false && this.schema !== true) { // while not required, makes it nicer.
-          delete this.schema.definitions;
-          delete this.schema.components;
-        }
-        return this.schema
-      });
+    await Promise.all(proms)
+    return this.schema;
   }
 
   /**
