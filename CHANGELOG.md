@@ -1,3 +1,10 @@
+## [1.5.6](https://github.com/json-schema-tools/dereferencer/compare/1.5.5...1.5.6) (2022-10-05)
+
+
+### Bug Fixes
+
+* bump everything ([ee37762](https://github.com/json-schema-tools/dereferencer/commit/ee37762e9bc72b3f67ffc7887050e2e9d9864b5e))
+
 ## [1.5.5](https://github.com/json-schema-tools/dereferencer/compare/1.5.4...1.5.5) (2022-06-29)
 
 
