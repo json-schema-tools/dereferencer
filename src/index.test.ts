@@ -148,7 +148,7 @@ describe("Dereferencer", () => {
   });
 
   it("can deal with root refs-to-ref as url", async () => {
-    expect.assertions(7);
+    expect.assertions(8);
     const dereferencer = new Dereferencer({
       $ref: "https://meta.json-schema.tools",
     });
@@ -156,7 +156,7 @@ describe("Dereferencer", () => {
     expect(dereffed).toBeDefined();
     expect(dereffed.oneOf).toBeInstanceOf(Array);
 
-    const oneOfs = dereffed.oneOf as JSONSchemaObject[];
+    const oneOfs = dereffed.oneOf as any;
 
     expect(oneOfs[0].type).toBe("object");
     expect(oneOfs[1].type).toBe("boolean");
@@ -165,6 +165,28 @@ describe("Dereferencer", () => {
       (oneOfs[0].properties as Properties).minProperties.title
     ).toBe("nonNegativeIntegerDefaultZero");
     expect(dereffed.definitions).toBeUndefined();
+    expect(oneOfs[0].properties.contains).toBe(dereffed);
+  });
+
+  it("can deal with root refs-to-ref as url, metaschema on master", async () => {
+    expect.assertions(8);
+    const dereferencer = new Dereferencer({
+      $ref: "https://raw.githubusercontent.com/json-schema-tools/meta-schema/master/schema.json",
+    });
+    const dereffed = await dereferencer.resolve() as JSONSchemaObject;
+    expect(dereffed).toBeDefined();
+    expect(dereffed.oneOf).toBeInstanceOf(Array);
+
+    const oneOfs = dereffed.oneOf as any;
+
+    expect(oneOfs[0].type).toBe("object");
+    expect(oneOfs[1].type).toBe("boolean");
+    expect((oneOfs[0].properties as Properties).additionalItems).toBe(dereffed);
+    expect(
+      (oneOfs[0].properties as Properties).minProperties.title
+    ).toBe("nonNegativeIntegerDefaultZero");
+    expect(dereffed.definitions).toBeUndefined();
+    expect(oneOfs[0].properties.contains).toBe(dereffed);
   });
 
   it("can deal with root refs-to-ref as file", async () => {
@@ -263,6 +285,71 @@ describe("Dereferencer", () => {
     const r = await dereferencer.resolve() as JSONSchemaObject;
     expect(r.description).toBe("abc");
     expect(r.title).toBe("bar");
+  });
+
+  it("handles definitions that are cyclical", async () => {
+    const dereferencer = new Dereferencer({
+      title: "rewt",
+      oneOf: [
+        { $ref: "#/definitions/a" },
+      ],
+      definitions: {
+        a: { $ref: "#/definitions/rewt" },
+        rewt: { $ref: "#" }
+      }
+    });
+    const r = await dereferencer.resolve() as any;
+    expect(r.title).toBe("rewt");
+    expect(r.oneOf[0].title).toBe("rewt");
+  });
+
+  it("handles definitions that are deeply cyclical", async () => {
+    const dereferencer = new Dereferencer({
+      title: "rewt",
+      oneOf: [
+        { $ref: "#/definitions/rewt" },
+        { $ref: "#/definitions/a" },
+      ],
+      definitions: {
+        a: {
+          title: "foo",
+          type: "object",
+          properties: {
+            b: { $ref: "#/definitions/rewt" }
+          }
+        },
+        rewt: { $ref: "#" }
+      }
+    });
+    const r = await dereferencer.resolve() as any;
+    expect(r.title).toBe("rewt");
+    expect(r.oneOf[0].title).toBe("rewt");
+    expect(r.oneOf[1].title).toBe("foo");
+    expect(r.oneOf[1].properties.b.title).toBe("rewt");
+  });
+
+  it("reversing order inside oneOf makes no difference", async () => {
+    const dereferencer = new Dereferencer({
+      title: "rewt",
+      oneOf: [
+        { $ref: "#/definitions/a" },
+        { $ref: "#/definitions/rewt" },
+      ],
+      definitions: {
+        a: {
+          title: "foo",
+          type: "object",
+          properties: {
+            b: { $ref: "#/definitions/rewt" }
+          }
+        },
+        rewt: { $ref: "#" }
+      }
+    });
+    const r = await dereferencer.resolve() as any;
+    expect(r.title).toBe("rewt");
+    expect(r.oneOf[0].title).toBe("foo");
+    expect(r.oneOf[0].properties.b.title).toBe("rewt");
   });
 });
 
