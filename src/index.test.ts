@@ -351,6 +351,20 @@ describe("Dereferencer", () => {
     expect(r.oneOf[0].title).toBe("foo");
     expect(r.oneOf[0].properties.b.title).toBe("rewt");
   });
+
+  it("does not mutate the original schema", async () => {
+    const s: JSONSchema = Object.freeze({
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { $ref: "#/properties/foo" },
+        baz: { $ref: "#/properties/bar" },
+      },
+    });
+    const dereferencer = new Dereferencer(s);
+
+    expect(await dereferencer.resolve()).not.toThrow();
+  });
 });
 
 
