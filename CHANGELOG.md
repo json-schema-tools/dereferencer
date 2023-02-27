@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/json-schema-tools/dereferencer/compare/1.6.0...1.6.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* update node modules ([0742718](https://github.com/json-schema-tools/dereferencer/commit/0742718e05137449ade5d3cdb2ffab9b4624f572))
+
 # [1.6.0](https://github.com/json-schema-tools/dereferencer/compare/1.5.7...1.6.0) (2023-02-27)
 
 
