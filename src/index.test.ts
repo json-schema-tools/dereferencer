@@ -351,8 +351,11 @@ describe("Dereferencer", () => {
     expect(r.oneOf[0].title).toBe("foo");
     expect(r.oneOf[0].properties.b.title).toBe("rewt");
   });
+});
 
-  it("does not mutate the original schema", async () => {
+
+describe("mutate", () => {
+  it("default does not mutate the original schema", async () => {
     const s: JSONSchema = Object.freeze({
       type: "object",
       properties: {
@@ -372,8 +375,22 @@ describe("Dereferencer", () => {
       },
     });
   });
-});
 
+  it("mutate option causes original schema to be modified", async () => {
+    const s: JSONSchema = {
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { $ref: "#/properties/foo" },
+        baz: { $ref: "#/properties/bar" },
+      },
+    };
+    const dereferencer = new Dereferencer(s, { mutate: true });
+
+    expect(await dereferencer.resolve()).toBe(s);
+  });
+
+});
 
 describe("custom protocol handling", () => {
 
