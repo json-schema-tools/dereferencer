@@ -80,16 +80,17 @@ export default class Dereferencer {
   public refCache: RefCache = {};
 
   constructor(schema: JSONSchema, private options: DereferencerOptions = {}) {
+    const schemaCopy = schema === true || schema === false ? schema : { ...schema };
     if (this.options.recursive === undefined) {
       this.options.recursive = true;
     }
 
     if (this.options.rootSchema === undefined) {
-      this.options.rootSchema = schema;
+      this.options.rootSchema = schemaCopy;
     }
 
     if (schema !== true && schema !== false && schema.$id) {
-      this.options.rootSchema = schema;
+      this.options.rootSchema = schemaCopy;
     }
 
     if (this.options.refCache) {
@@ -102,7 +103,7 @@ export default class Dereferencer {
       }
     }
 
-    this.schema = schema; // shallow copy breaks recursive
+    this.schema = schemaCopy; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
 

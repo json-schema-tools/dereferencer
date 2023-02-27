@@ -17,7 +17,7 @@ describe("Dereferencer", () => {
     } as JSONSchema;
     const dereferencer = new Dereferencer(test);
     const dereffed = await dereferencer.resolve();
-    expect(dereffed).toBe(test);
+    expect(dereffed).toStrictEqual(test);
   });
 
   it("simple dereffing", async () => {
@@ -363,7 +363,14 @@ describe("Dereferencer", () => {
     });
     const dereferencer = new Dereferencer(s);
 
-    expect(await dereferencer.resolve()).not.toThrow();
+    expect(await dereferencer.resolve()).toStrictEqual({
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { type: "string" },
+        baz: { type: "string" },
+      },
+    });
   });
 });
 
