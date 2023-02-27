@@ -17,7 +17,7 @@ describe("Dereferencer", () => {
     } as JSONSchema;
     const dereferencer = new Dereferencer(test);
     const dereffed = await dereferencer.resolve();
-    expect(dereffed).toBe(test);
+    expect(dereffed).toStrictEqual(test);
   });
 
   it("simple dereffing", async () => {
@@ -353,6 +353,44 @@ describe("Dereferencer", () => {
   });
 });
 
+
+describe("mutate", () => {
+  it("default does not mutate the original schema", async () => {
+    const s: JSONSchema = Object.freeze({
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { $ref: "#/properties/foo" },
+        baz: { $ref: "#/properties/bar" },
+      },
+    });
+    const dereferencer = new Dereferencer(s);
+
+    expect(await dereferencer.resolve()).toStrictEqual({
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { type: "string" },
+        baz: { type: "string" },
+      },
+    });
+  });
+
+  it("mutate option causes original schema to be modified", async () => {
+    const s: JSONSchema = {
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { $ref: "#/properties/foo" },
+        baz: { $ref: "#/properties/bar" },
+      },
+    };
+    const dereferencer = new Dereferencer(s, { mutate: true });
+
+    expect(await dereferencer.resolve()).toBe(s);
+  });
+
+});
 
 describe("custom protocol handling", () => {
 

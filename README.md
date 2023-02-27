@@ -4,7 +4,6 @@
   <span>
     <img alt="CircleCI branch" src="https://img.shields.io/circleci/project/github/json-schema-tools/dereferencer/master.svg">
     <img src="https://codecov.io/gh/json-schema-tools/dereferencer/branch/master/graph/badge.svg" />
-    <img alt="Dependabot status" src="https://api.dependabot.com/badges/status?host=github&repo=json-schema-tools/dereferencer" />
     <img alt="npm" src="https://img.shields.io/npm/dt/@json-schema-tools/dereferencer.svg" />
     <img alt="GitHub release" src="https://img.shields.io/github/release/json-schema-tools/dereferencer.svg" />
     <img alt="GitHub commits since latest release" src="https://img.shields.io/github/commits-since/json-schema-tools/dereferencer/latest.svg" />
@@ -26,7 +25,6 @@ Built using @json-schema-tools/traverse
   - relative pointer refs
   - http/https uris
   - local filesystem references
-- complete disrespect for $id
 - configurable
  - optionally de-reference internal references only, keeping it synchronous
  - ignore refs that match a set of patterns
@@ -34,6 +32,7 @@ Built using @json-schema-tools/traverse
   - dependency injectable fetch and filesystem
   - middleware allows you to easily implement new $ref values.
   - easily add behaviors for custom reference locations
+- option for mutating in place or returning a copy
 
 ## Getting Started
 

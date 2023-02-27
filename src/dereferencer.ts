@@ -14,6 +14,10 @@ export interface DereferencerOptions {
    */
   recursive?: boolean;
   /**
+   * If true, the schema passed in will be dereferenced in-place, mutating the original. Default is false.
+   */
+  mutate?: boolean;
+  /**
    * Preseed the dereferencer with resolved refs
    */
   refCache?: RefCache;
@@ -80,16 +84,24 @@ export default class Dereferencer {
   public refCache: RefCache = {};
 
   constructor(schema: JSONSchema, private options: DereferencerOptions = {}) {
+
+    let workingSchema: JSONSchema;
+    if (this.options.mutate === true) {
+      workingSchema = schema;
+    } else {
+      workingSchema = schema === true || schema === false ? schema : { ...schema };
+    }
+
     if (this.options.recursive === undefined) {
       this.options.recursive = true;
     }
 
     if (this.options.rootSchema === undefined) {
-      this.options.rootSchema = schema;
+      this.options.rootSchema = workingSchema;
     }
 
     if (schema !== true && schema !== false && schema.$id) {
-      this.options.rootSchema = schema;
+      this.options.rootSchema = workingSchema;
     }
 
     if (this.options.refCache) {
@@ -102,7 +114,7 @@ export default class Dereferencer {
       }
     }
 
-    this.schema = schema; // shallow copy breaks recursive
+    this.schema = workingSchema; // shallow copy breaks recursive
     this.refs = this.collectRefs();
   }
 
