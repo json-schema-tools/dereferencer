@@ -1,3 +1,17 @@
+# [1.6.0](https://github.com/json-schema-tools/dereferencer/compare/1.5.7...1.6.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* no longer mutates original schema ([9fdc908](https://github.com/json-schema-tools/dereferencer/commit/9fdc90894b1c7122e953bfe0c3d6857099cc3acf))
+* update to node 18 ([fd5c184](https://github.com/json-schema-tools/dereferencer/commit/fd5c1849ebcf1eec85ab013112eb04c401d3acbf))
+* write test to show issue ([8df84f4](https://github.com/json-schema-tools/dereferencer/commit/8df84f41742b4cacb789878756406516a89bfab9))
+
+
+### Features
+
+* add an option to toggle mutation of original schema ([499657f](https://github.com/json-schema-tools/dereferencer/commit/499657f488360aacb76ec3528e9360df3e42ec13))
+
 ## [1.5.7](https://github.com/json-schema-tools/dereferencer/compare/1.5.6...1.5.7) (2022-10-05)
 
 
