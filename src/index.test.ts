@@ -1,3 +1,4 @@
+import {inspect} from 'util';
 import Dereferencer, { NonStringRefError } from "./index";
 import { Properties, JSONSchemaObject, JSONSchema } from "@json-schema-tools/meta-schema";
 
@@ -404,5 +405,17 @@ describe("custom protocol handling", () => {
     const r = await dereferencer.resolve() as JSONSchemaObject;
 
     expect(r.title).toBe(ref)
+  });
+});
+
+
+describe("openrpc metaschema", () => {
+
+  it("can deref it", async () => {
+    const ref = "https://meta.open-rpc.org/";
+    const dereferencer = new Dereferencer({ $ref: ref });
+    const r = await dereferencer.resolve() as JSONSchemaObject;
+
+    expect(r.title).toBe('openrpcDocument');
   });
 });
