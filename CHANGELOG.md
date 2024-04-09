@@ -1,3 +1,12 @@
+## [1.6.2](https://github.com/json-schema-tools/dereferencer/compare/1.6.1...1.6.2) (2024-04-09)
+
+
+### Bug Fixes
+
+* bump ci node versions ([8413967](https://github.com/json-schema-tools/dereferencer/commit/84139674558c845543197528a170b964fc6df218))
+* bump to node 20 ([7bcabd4](https://github.com/json-schema-tools/dereferencer/commit/7bcabd42e594022e8d82e4766b94b59ee7f72501))
+* bump traverse ([ca9060e](https://github.com/json-schema-tools/dereferencer/commit/ca9060ef19e05c4055862249f0de82b44805a89a))
+
 ## [1.6.1](https://github.com/json-schema-tools/dereferencer/compare/1.6.0...1.6.1) (2023-02-27)
 
 
