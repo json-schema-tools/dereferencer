@@ -1,5 +1,9 @@
 version: 2
 
+import:
+  - repository: json-schema-tools/foundation
+    path: 'workflows/test.yaml'
+
 aliases:
   # -------------------------
   #      ALIASES: Caches
@@ -26,10 +30,6 @@ defaults: &defaults
   working_directory: ~/project
   docker:
     - image: cimg/node:20.12.1
-
-import:
-  - repository: json-schema-tools/foundation # this is myself??
-    path: '.circleci/test.yaml'
 
 jobs:
   test:
