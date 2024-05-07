@@ -28,7 +28,7 @@
     "!build/**/*.test.*"
   ],
   "devDependencies": {
-    "@json-schema-tools/meta-schema": "^1.7.0",
+    "@json-schema-tools/meta-schema": "^1.7.5",
     "@types/jest": "^29.1.1",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
@@ -40,8 +40,8 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@json-schema-tools/reference-resolver": "^1.2.5",
-    "@json-schema-tools/traverse": "^1.10.3",
+    "@json-schema-tools/reference-resolver": "^1.2.6",
+    "@json-schema-tools/traverse": "^1.10.4",
     "fast-safe-stringify": "^2.1.1"
   }
 }
