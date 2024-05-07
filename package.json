@@ -40,7 +40,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@json-schema-tools/reference-resolver": "^1.2.5",
+    "@json-schema-tools/reference-resolver": "^1.2.6",
     "@json-schema-tools/traverse": "^1.10.3",
     "fast-safe-stringify": "^2.1.1"
   }
