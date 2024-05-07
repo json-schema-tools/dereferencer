@@ -1,3 +1,12 @@
+## [1.6.3](https://github.com/json-schema-tools/dereferencer/compare/1.6.2...1.6.3) (2024-05-07)
+
+
+### Bug Fixes
+
+* bump json-schema-tools deps ([94d667d](https://github.com/json-schema-tools/dereferencer/commit/94d667d7ebf47a2aaf6a3d96504dfdb708ed8c72))
+* bump reference-resolver ([8eec2f6](https://github.com/json-schema-tools/dereferencer/commit/8eec2f67f694d7e0057a7033e4868125e6c4bbc7))
+* bump traverse ([7cfef95](https://github.com/json-schema-tools/dereferencer/commit/7cfef95af2b4bbc12c1f886c4804c4308fc74794))
+
 ## [1.6.2](https://github.com/json-schema-tools/dereferencer/compare/1.6.1...1.6.2) (2024-04-09)
 
 
