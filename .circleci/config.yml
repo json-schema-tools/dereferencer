@@ -12,6 +12,14 @@ aliases:
     paths:
       - ~/project/node_modules
 
+  - &restore-build-cache
+    key: build-cache-{{ .Revision }}
+
+  - &save-build-cache
+    key: build-cache-{{ .Revision }}
+    paths:
+      - ~/project/build
+
   # -------------------------
   #  ALIASES: Branch Filters
   # -------------------------
@@ -33,7 +41,7 @@ jobs:
     steps:
       - checkout
       - restore_cache: *restore-deps-cache
-      - run: npm install
+      - run: npm ci
       - run: npm install codecov
       - run: npm test
       - run: ./node_modules/.bin/codecov
@@ -43,17 +51,24 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - restore_cache: *restore-deps-cache
-      - run: npm install
+      - restore_cache:
+          keys:
+            - *restore-deps-cache
+            - *restore-build-cache
+      - run: npm ci
       - run: npm run build
+      - save_cache: *save-build-cache
       - save_cache: *save-deps-cache
 
   release:
     <<: *defaults
     steps:
       - checkout
-      - restore_cache: *restore-deps-cache
-      - run: npm install
+      - restore_cache:
+          keys:
+            - *restore-deps-cache
+            - *restore-build-cache
+      - run: npm ci
       - run: npm run build
       - run: npm install semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github @semantic-release/npm @semantic-release/commit-analyzer @semantic-release/release-notes-generator @qiwi/semantic-release-gh-pages-plugin
       - run: git checkout package.json package-lock.json
