@@ -75,6 +75,46 @@ const copyOrNot = (s1: JSONSchemaObject, s2: JSONSchema) => {
 }
 
 /**
+ * Deep-copies a schema, preserving cycles and shared references. Functions
+ * and other non-plain objects (class instances, Dates, ...) are passed
+ * through by reference: the dereferencer never writes into them, so sharing
+ * them is safe.
+ */
+const deepCopySchema = (value: any, seen: Map<object, any> = new Map()): any => {
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+  const cached = seen.get(value);
+  if (cached !== undefined) {
+    return cached;
+  }
+  if (Array.isArray(value)) {
+    const copy: any[] = [];
+    seen.set(value, copy);
+    for (const item of value) {
+      copy.push(deepCopySchema(item, seen));
+    }
+    return copy;
+  }
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== Object.prototype && proto !== null) {
+    return value;
+  }
+  const copy: { [k: string]: any } = {};
+  seen.set(value, copy);
+  for (const k of Object.keys(value)) {
+    copy[k] = deepCopySchema(value[k], seen);
+  }
+  return copy;
+}
+
+/**
+ * True for refs that resolve against the root schema document ("#" and
+ * "#/..."), as opposed to refs that fetch a separate document.
+ */
+const isLocalRef = (ref: string): boolean => ref.startsWith("#");
+
+/**
  * When instantiated, represents a fully configured dereferencer. When constructed, references are pulled out.
  * No references are fetched until .resolve is called.
  */
@@ -89,7 +129,10 @@ export default class Dereferencer {
     if (this.options.mutate === true) {
       workingSchema = schema;
     } else {
-      workingSchema = schema === true || schema === false ? schema : { ...schema };
+      // A shallow copy is not enough: nested objects are still the caller's,
+      // and resolving (especially cycles, see #753) writes into them.
+      // deepCopySchema passes booleans through untouched.
+      workingSchema = deepCopySchema(schema);
     }
 
     if (this.options.recursive === undefined) {
@@ -102,6 +145,11 @@ export default class Dereferencer {
 
     if (schema !== true && schema !== false && schema.$id) {
       this.options.rootSchema = workingSchema;
+    }
+
+    if (this.options.mutate !== true && this.options.rootSchema !== workingSchema) {
+      // A caller-provided rootSchema is also not ours to write to.
+      this.options.rootSchema = deepCopySchema(this.options.rootSchema);
     }
 
     if (this.options.refCache) {
@@ -164,9 +212,22 @@ export default class Dereferencer {
         const subDerefferOpts = {
           ...this.options,
           refCache: this.refCache,
+          // Resolve the fetched schema in place. The pre-set above points
+          // self-references at this very object, so cycles close the loop
+          // on it instead of being written into the caller's schema (#753).
+          mutate: true,
         };
 
-        const subDereffer = new Dereferencer(fetched, subDerefferOpts);
+        let subSchema = fetched;
+        if (!isLocalRef(ref)) {
+          // A fetched document is not ours to change: detach it first and
+          // re-point the cache at the detached copy, so self-references
+          // close the loop on the copy rather than the handler's object.
+          subSchema = deepCopySchema(fetched);
+          this.refCache[ref] = subSchema;
+        }
+
+        const subDereffer = new Dereferencer(subSchema, subDerefferOpts);
         if (subDereffer.refs.length !== 0) {
           const subFetchedProm = subDereffer._resolve();
           proms.push(subFetchedProm);

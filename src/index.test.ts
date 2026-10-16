@@ -199,19 +199,23 @@ describe("Dereferencer", () => {
     const dereffed = await dereferencer.resolve();
 
 
+    // The cycle closes on the resolved node itself: items.properties is the
+    // same object as tree.properties. (Before #753 this wove through the
+    // caller's live objects, producing a distinct properties object here.)
+    const treeProperties: { name: object, children: object } = {
+      name: {
+        type: 'string'
+      },
+      children: {},
+    };
     const recursiveChildren = {
       type: 'array',
       items: {
         type: 'object',
-        properties: {
-          name: {
-            type: 'string'
-          },
-          children: {}
-        }
+        properties: treeProperties,
       },
     };
-    recursiveChildren.items.properties.children = recursiveChildren
+    treeProperties.children = recursiveChildren;
 
     const expected = {
       type: "object",
@@ -219,17 +223,91 @@ describe("Dereferencer", () => {
         tree: {
           title: "Recursive references",
           type: "object",
-          properties: {
-            name: {
-              type: 'string'
-            },
-            children: recursiveChildren
-          }
+          properties: treeProperties,
         },
       }
     }
 
     expect(dereffed).toStrictEqual(expected);
+  });
+
+  it("circular refs do not write the cycle into the input schema (#753)", async () => {
+    const input = {
+      title: "node",
+      type: "object",
+      properties: { child: { $ref: "#/definitions/node" } },
+      definitions: {
+        node: {
+          title: "node",
+          type: "object",
+          properties: { next: { $ref: "#/definitions/node" } },
+        },
+      },
+    };
+    const snapshot = JSON.parse(JSON.stringify(input));
+
+    const dereffed = await new Dereferencer(input as JSONSchema).resolve() as any;
+
+    // the caller's object is untouched: $refs intact, no cycle introduced
+    expect(input).toStrictEqual(snapshot);
+    expect(() => JSON.stringify(input)).not.toThrow();
+
+    // ...but the returned schema carries the cycle, detached from the input
+    expect(dereffed.properties.child.properties.next).toBe(dereffed.properties.child);
+    expect(dereffed.properties.child).not.toBe((input as any).definitions.node);
+  });
+
+  it("preserves shared subschema objects without mutating the input (#753)", async () => {
+    const shared = { type: "string" };
+    const input = {
+      type: "object",
+      properties: { a: shared, b: shared },
+    } as any;
+
+    const dereffed = await new Dereferencer(input).resolve() as any;
+
+    expect(dereffed.properties.a).toBe(dereffed.properties.b);
+    expect(input.properties.a).toBe(shared);
+    expect(input.properties.b).toBe(shared);
+  });
+
+  it("copies input schemas that already contain object cycles (#753)", async () => {
+    const input: any = {
+      type: "object",
+      properties: { name: { type: "string" } },
+    };
+    input.properties.self = input;
+
+    const dereffed = await new Dereferencer(input).resolve() as any;
+
+    expect(dereffed.properties.self).toBe(dereffed);
+    expect(input.properties.self).toBe(input);
+    expect(input.properties.name).toStrictEqual({ type: "string" });
+  });
+
+  it("does not mutate a caller-provided rootSchema (#753)", async () => {
+    const rootSchema = {
+      definitions: { s: { type: "string" } },
+    } as any;
+    const snapshot = JSON.parse(JSON.stringify(rootSchema));
+
+    const dereffed = await new Dereferencer(
+      { $ref: "#/definitions/s" } as JSONSchema,
+      { rootSchema },
+    ).resolve();
+
+    expect(rootSchema).toStrictEqual(snapshot);
+    expect(dereffed).toStrictEqual({ type: "string" });
+  });
+
+  it("passes non-plain objects through the copy by reference (#753)", async () => {
+    class Custom { }
+    const custom = new Custom();
+    const input = { type: "object", "x-custom": custom } as any;
+
+    const dereffed = await new Dereferencer(input).resolve() as any;
+
+    expect(dereffed["x-custom"]).toBe(custom);
   });
 
   it("can deal with root refs-to-ref as url, metaschema on master", async () => {
