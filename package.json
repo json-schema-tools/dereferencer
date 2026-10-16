@@ -11,8 +11,9 @@
     "build:code": "tsc",
     "lint": "eslint . --ext .ts --fix",
     "test": "npm run test:unit && npm run test:web",
-    "test:unit": "jest --coverage",
-    "test:web": "npm run build:code"
+    "test:unit": "jest --coverage --runInBand",
+    "test:web": "npm run build:code",
+    "coverage:bump": "jest-it-up"
   },
   "author": "BelfordZ<belfordz66@gmail.com>",
   "license": "Apache-2.0",
@@ -37,7 +38,8 @@
     "jest": "^29.4.3",
     "ts-jest": "^29.0.5",
     "typedoc": "^0.26.10",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "jest-it-up": "^4.0.1"
   },
   "dependencies": {
     "@json-schema-tools/reference-resolver": "^1.2.6",
