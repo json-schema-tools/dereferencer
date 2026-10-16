@@ -1,6 +1,6 @@
 {
   "name": "@json-schema-tools/dereferencer",
-  "version": "0.0.0-development",
+  "version": "1.6.4",
   "description": "Dereference (aka parse refs) from JSON Schemas",
   "main": "build/index.js",
   "publishConfig": {

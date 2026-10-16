@@ -7,6 +7,13 @@
 * bump reference-resolver ([8eec2f6](https://github.com/json-schema-tools/dereferencer/commit/8eec2f67f694d7e0057a7033e4868125e6c4bbc7))
 * bump traverse ([7cfef95](https://github.com/json-schema-tools/dereferencer/commit/7cfef95af2b4bbc12c1f886c4804c4308fc74794))
 
+## [1.6.4](https://github.com/json-schema-tools/dereferencer/compare/1.6.3...1.6.4) (2026-10-16)
+
+
+### Bug Fixes
+
+* **recursion:** resolve infinite loop with recursive links ([#717](https://github.com/json-schema-tools/dereferencer/issues/717)) ([45ef705](https://github.com/json-schema-tools/dereferencer/commit/45ef70591ef830ffae144a7376d63480550cafcf))
+
 ## [1.6.2](https://github.com/json-schema-tools/dereferencer/compare/1.6.1...1.6.2) (2024-04-09)
 
 
