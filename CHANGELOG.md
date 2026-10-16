@@ -7,6 +7,13 @@
 * bump reference-resolver ([8eec2f6](https://github.com/json-schema-tools/dereferencer/commit/8eec2f67f694d7e0057a7033e4868125e6c4bbc7))
 * bump traverse ([7cfef95](https://github.com/json-schema-tools/dereferencer/commit/7cfef95af2b4bbc12c1f886c4804c4308fc74794))
 
+## [1.6.6](https://github.com/json-schema-tools/dereferencer/compare/1.6.5...1.6.6) (2026-10-16)
+
+
+### Bug Fixes
+
+* add resolveSync() for internal references ([#625](https://github.com/json-schema-tools/dereferencer/issues/625)) ([#758](https://github.com/json-schema-tools/dereferencer/issues/758)) ([41f8332](https://github.com/json-schema-tools/dereferencer/commit/41f8332d546affd31c763c922b53d91e59ac5f82))
+
 ## [1.6.5](https://github.com/json-schema-tools/dereferencer/compare/1.6.4...1.6.5) (2026-10-16)
 
 
