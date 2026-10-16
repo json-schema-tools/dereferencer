@@ -157,6 +157,7 @@ export default class Dereferencer {
         const refProm = referenceResolver.resolve(ref, this.options.rootSchema);
         proms.push(refProm);
         fetched = await refProm as JSONSchema;
+        this.refCache[ref] = fetched
       }
 
       if (this.options.recursive === true && fetched !== true && fetched !== false && ref !== "#") {

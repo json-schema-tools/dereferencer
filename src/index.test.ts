@@ -1,4 +1,3 @@
-import {inspect} from 'util';
 import Dereferencer, { NonStringRefError } from "./index";
 import { Properties, JSONSchemaObject, JSONSchema } from "@json-schema-tools/meta-schema";
 
@@ -167,6 +166,70 @@ describe("Dereferencer", () => {
     ).toBe("nonNegativeIntegerDefaultZero");
     expect(dereffed.definitions).toBeUndefined();
     expect(oneOfs[0].properties.contains).toBe(dereffed);
+  });
+
+  it("does not get stuck on a recursive ", async () => {
+    expect.assertions(1);
+    const dereferencer = new Dereferencer({
+      definitions: {
+        node: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string"
+            },
+            children: {
+              type: "array",
+              items: {
+                $ref: "#/definitions/node"
+              }
+            }
+          }
+        }
+      },
+      type: "object",
+      properties: {
+        tree: {
+          title: "Recursive references",
+          $ref: "#/definitions/node"
+        }
+      }
+    });
+
+    const dereffed = await dereferencer.resolve();
+
+
+    const recursiveChildren = {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string'
+          },
+          children: {}
+        }
+      },
+    };
+    recursiveChildren.items.properties.children = recursiveChildren
+
+    const expected = {
+      type: "object",
+      properties: {
+        tree: {
+          title: "Recursive references",
+          type: "object",
+          properties: {
+            name: {
+              type: 'string'
+            },
+            children: recursiveChildren
+          }
+        },
+      }
+    }
+
+    expect(dereffed).toStrictEqual(expected);
   });
 
   it("can deal with root refs-to-ref as url, metaschema on master", async () => {
