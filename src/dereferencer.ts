@@ -1,6 +1,7 @@
 import { JSONSchema, JSONSchemaObject } from "@json-schema-tools/meta-schema";
 import traverse from "@json-schema-tools/traverse";
 import referenceResolver from "@json-schema-tools/reference-resolver";
+import resolvePointer from "@json-schema-tools/reference-resolver/build/resolve-pointer";
 import safeStringify from "fast-safe-stringify";
 import { ProtocolHandlerMap } from "@json-schema-tools/reference-resolver/build/reference-resolver";
 
@@ -130,6 +131,89 @@ export default class Dereferencer {
     await this._resolve();
     delete (this.schema as any).definitions;
     delete (this.schema as any).components;
+    return this.schema;
+  }
+
+  /**
+   * Synchronously dereferences all internal references in the configured input schema(s).
+   *
+   * Only references that can be resolved without I/O are supported: JSON pointers
+   * into the root schema (e.g. "#/properties/foo") and "#" (the root schema itself).
+   * Remote, file-system, and custom-protocol references require asynchronous
+   * fetching and will throw; use `await resolve()` for those.
+   *
+   * @returns a fully dereferenced schema, where all internal refs have been resolved.
+   */
+  public resolveSync(): JSONSchema {
+    this._resolveSync();
+    delete (this.schema as any).definitions;
+    delete (this.schema as any).components;
+    return this.schema;
+  }
+
+  private _resolveSync(): JSONSchema {
+    if (this.schema === true || this.schema === false) {
+      return this.schema;
+    }
+
+    if (this.refs.length === 0) {
+      return this.schema;
+    }
+    const unfetchedRefs = this.refs.filter((r) => this.refCache[r] === undefined);
+
+    for (const ref of unfetchedRefs) {
+      let fetched: JSONSchema;
+      if (this.refCache[ref] !== undefined) {
+        fetched = this.refCache[ref];
+      } else if (ref === "#") {
+        if (this.options.rootSchema === undefined) {
+          throw new Error("options.rootSchema was not provided, but one of the schemas references '#'");
+        }
+        fetched = this.options.rootSchema;
+      } else if (ref[0] === "#") {
+        fetched = resolvePointer(ref, this.options.rootSchema);
+        this.refCache[ref] = fetched;
+      } else {
+        throw new Error(
+          `resolveSync() cannot resolve $ref "${ref}": only internal references (starting with "#") ` +
+          `can be resolved synchronously. Use \`await dereferencer.resolve()\` for remote, file-system, ` +
+          `or custom-protocol references.`
+        );
+      }
+
+      if (this.options.recursive === true && fetched !== true && fetched !== false && ref !== "#") {
+        const subDerefferOpts = {
+          ...this.options,
+          refCache: this.refCache,
+        };
+
+        const subDereffer = new Dereferencer(fetched, subDerefferOpts);
+        if (subDereffer.refs.length !== 0) {
+          const subFetched = subDereffer._resolveSync();
+          this.refCache[ref] = copyOrNot(fetched, subFetched);
+        } else {
+          this.refCache[ref] = fetched;
+        }
+      } else {
+        this.refCache[ref] = fetched;
+      }
+    }
+
+    if (this.schema.$ref !== undefined) {
+      this.schema = copyOrNot(this.schema, this.refCache[this.schema.$ref]);
+    } else {
+      traverse(this.schema, (s) => {
+        if (s === true || s === false) {
+          return s;
+        }
+        if (s.$ref !== undefined) {
+          const reffedSchema = this.refCache[s.$ref];
+          return copyOrNot(s, reffedSchema);
+        }
+        return s;
+      }, { mutable: true });
+    }
+
     return this.schema;
   }
 

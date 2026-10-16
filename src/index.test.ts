@@ -499,3 +499,216 @@ describe("openrpc metaschema", () => {
     expect(r.title).toBe('openrpcDocument');
   });
 });
+
+
+describe("resolveSync", () => {
+
+  it("resolves internal refs synchronously", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { $ref: "#/properties/foo" },
+      },
+    } as JSONSchema);
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    const props = dereffed.properties as Properties;
+    expect(props.bar).toBe(props.foo);
+  });
+
+  it("does nothing when there are no refs", () => {
+    const test = {
+      type: "object",
+      properties: {
+        foo: { type: "string" }
+      }
+    } as JSONSchema;
+    const dereferencer = new Dereferencer(test);
+    expect(dereferencer.resolveSync()).toStrictEqual(test);
+  });
+
+  it("resolves refs into definitions and drops them", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        bar: { $ref: "#/definitions/leBool" },
+        foo: { $ref: "#/definitions/laBool" },
+      },
+      definitions: {
+        leBool: true,
+        laBool: false
+      }
+    } as JSONSchema);
+    expect(dereferencer.resolveSync()).toEqual({
+      type: "object",
+      properties: {
+        bar: true,
+        foo: false
+      },
+    });
+  });
+
+  it("recursively dereferences chained internal refs", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        a: { $ref: "#/definitions/b" },
+      },
+      definitions: {
+        b: { $ref: "#/definitions/c" },
+        c: { type: "string" },
+      }
+    } as JSONSchema);
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    expect((dereffed.properties as Properties).a).toEqual({ type: "string" });
+  });
+
+  it("keeps sibling keys alongside $ref", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        foo: { type: "string", title: "foo" },
+        bar: { $ref: "#/properties/foo", description: "a copy with extras" },
+      },
+    } as JSONSchema);
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    const props = dereffed.properties as Properties;
+    expect(props.bar).toEqual({ type: "string", title: "foo", description: "a copy with extras" });
+    expect(props.bar).not.toBe(props.foo);
+  });
+
+  it("resolves the root schema ref (#)", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+      },
+      additionalProperties: { $ref: "#" },
+    } as JSONSchema);
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    // { $ref: "#" } resolves to the root schema itself (same as await resolve())
+    expect(dereffed.additionalProperties).toBe(dereffed);
+    expect(dereffed.properties).toEqual({ foo: { type: "string" } });
+  });
+
+  it("terminates on cyclic internal refs", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        foo: { anyOf: [{ $ref: "#/properties/bar" }, { type: "string" }] },
+        bar: { $ref: "#/properties/foo" },
+      },
+    } as JSONSchema);
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    const props = dereffed.properties as Properties;
+    expect((props.foo as JSONSchemaObject).anyOf).toBeDefined();
+  });
+
+  it("boolean schemas as root", () => {
+    const dereferencer = new Dereferencer(true);
+    expect(dereferencer.resolveSync()).toEqual(true);
+  });
+
+  it("honors a preseeded refCache", () => {
+    const dereferencer = new Dereferencer(
+      {
+        type: "object",
+        properties: {
+          bar: { $ref: "#/definitions/foo" },
+        },
+      } as JSONSchema,
+      { refCache: { "#/definitions/foo": { type: "string", title: "cached" } } }
+    );
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    expect((dereffed.properties as Properties).bar).toEqual({ type: "string", title: "cached" });
+  });
+
+  it("throws a clear error for remote refs", () => {
+    const dereferencer = new Dereferencer({ $ref: "https://example.com/schema.json" } as JSONSchema);
+    expect(() => dereferencer.resolveSync()).toThrow(
+      'resolveSync() cannot resolve $ref "https://example.com/schema.json"'
+    );
+  });
+
+  it("throws a clear error for file refs", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        fromFile: { $ref: "./src/test-schema.json" },
+      },
+    } as JSONSchema);
+    expect(() => dereferencer.resolveSync()).toThrow(
+      'resolveSync() cannot resolve $ref "./src/test-schema.json"'
+    );
+  });
+});
+
+describe("resolveSync options", () => {
+
+  it("does not recurse into fetched refs when recursive is false", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        a: { $ref: "#/definitions/b" },
+      },
+      definitions: {
+        b: { $ref: "#/definitions/c" },
+        c: { type: "string" },
+      }
+    } as JSONSchema, { recursive: false });
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    expect((dereffed.properties as Properties).a).toEqual({ $ref: "#/definitions/c" });
+  });
+
+  it("resolves a root-level $ref", () => {
+    const dereferencer = new Dereferencer({
+      $ref: "#/definitions/a",
+      definitions: { a: { type: "string" } },
+    } as JSONSchema);
+
+    expect(dereferencer.resolveSync()).toEqual({ type: "string" });
+  });
+
+  it("handles boolean subschemas", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        b: true,
+        c: { $ref: "#/properties/b" },
+      },
+    } as JSONSchema);
+
+    expect(dereferencer.resolveSync()).toEqual({
+      type: "object",
+      properties: { b: true, c: true },
+    });
+  });
+
+  it("keeps sibling keys when the resolved ref is boolean", () => {
+    const dereferencer = new Dereferencer({
+      type: "object",
+      properties: {
+        bar: { $ref: "#/definitions/leBool", description: "still just true" },
+      },
+      definitions: { leBool: true },
+    } as JSONSchema);
+
+    const dereffed = dereferencer.resolveSync() as JSONSchemaObject;
+    expect((dereffed.properties as Properties).bar).toBe(true);
+  });
+
+  it("throws when rootSchema is missing for a '#' ref", () => {
+    const dereferencer = new Dereferencer({ $ref: "#" } as JSONSchema);
+    (dereferencer as any).options.rootSchema = undefined;
+    expect(() => dereferencer.resolveSync()).toThrow(
+      "options.rootSchema was not provided"
+    );
+  });
+});
