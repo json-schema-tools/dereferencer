@@ -7,6 +7,13 @@
 * bump reference-resolver ([8eec2f6](https://github.com/json-schema-tools/dereferencer/commit/8eec2f67f694d7e0057a7033e4868125e6c4bbc7))
 * bump traverse ([7cfef95](https://github.com/json-schema-tools/dereferencer/commit/7cfef95af2b4bbc12c1f886c4804c4308fc74794))
 
+## [1.6.5](https://github.com/json-schema-tools/dereferencer/compare/1.6.4...1.6.5) (2026-10-16)
+
+
+### Bug Fixes
+
+* **deps:** require @json-schema-tools/traverse ^1.11.0 ([#750](https://github.com/json-schema-tools/dereferencer/issues/750)) ([d795ec0](https://github.com/json-schema-tools/dereferencer/commit/d795ec0bbfa78aedd505c06ee719a2db530ccff7))
+
 ## [1.6.4](https://github.com/json-schema-tools/dereferencer/compare/1.6.3...1.6.4) (2026-10-16)
 
 
