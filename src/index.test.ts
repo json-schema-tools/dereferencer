@@ -415,6 +415,23 @@ describe("Dereferencer", () => {
     expect(r.oneOf[0].title).toBe("foo");
     expect(r.oneOf[0].properties.b.title).toBe("rewt");
   });
+
+  it("dereferences refs alongside allOf at the same level (#736)", async () => {
+    const dereferencer = new Dereferencer({
+      type: ["object", "null"],
+      properties: {
+        termDetails: { $ref: "#/definitions/def2" },
+      },
+      allOf: [{ $ref: "#/definitions/def2" }],
+      title: "def1",
+      definitions: {
+        def2: { type: "string" },
+      },
+    });
+    const r = await dereferencer.resolve() as any;
+    expect(r.properties.termDetails).toEqual({ type: "string" });
+    expect(r.allOf).toEqual([{ type: "string" }]);
+  });
 });
 
 
