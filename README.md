@@ -62,8 +62,18 @@ const mySchema = {
 
 const dereferencer = new JsonSchemaDereferencer(mySchema);
 
-console.log(dereferencer.resolveSync());
 console.log(await dereferencer.resolve());
+
+// schemas whose $refs are all internal can be dereferenced synchronously:
+const internalDereferencer = new JsonSchemaDereferencer({
+    type: "object",
+    properties: {
+      foo: { type: "string" },
+      bar: { $ref: "#/properties/foo" }
+    }
+});
+
+console.log(internalDereferencer.resolveSync());
 ```
 
 
@@ -84,9 +94,11 @@ const dereferencer = new JsonSchemaDereferencer(mySchema, {
     "ipfs": (ref) => Promise.resolve({ type: "string", title: "pretend we got this from ipfs" })
 });
 
-console.log(dereferencer.resolveSync());
 console.log(await dereferencer.resolve());
 ```
+
+> Note: `resolveSync()` only supports internal references (starting with `#`).
+> Remote, file-system, and custom-protocol references require `await dereferencer.resolve()`.
 
 
 ### Contributing
