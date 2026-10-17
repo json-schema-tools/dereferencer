@@ -310,6 +310,82 @@ describe("Dereferencer", () => {
     expect(dereffed["x-custom"]).toBe(custom);
   });
 
+  it("preserves identity shared between schema and an explicit rootSchema (#753)", async () => {
+    const shared = { type: "string", title: "shared" };
+    const rootSchema = { definitions: { s: shared } } as any;
+    const schema = {
+      properties: { p: { $ref: "#/definitions/s" }, q: shared },
+    } as any;
+
+    const dereffed = await new Dereferencer(schema, { rootSchema }).resolve() as any;
+
+    expect(dereffed.properties.p).toBe(dereffed.properties.q);
+    expect(rootSchema).toStrictEqual({ definitions: { s: { type: "string", title: "shared" } } });
+  });
+
+  it("preserves own __proto__ properties when copying (#753)", async () => {
+    const input = JSON.parse('{"type": "object", "__proto__": {"type": "string"}}');
+    expect(Object.prototype.hasOwnProperty.call(input, "__proto__")).toBe(true);
+
+    const dereffed = await new Dereferencer(input as JSONSchema).resolve() as any;
+
+    expect(Object.getPrototypeOf(dereffed)).toBe(Object.prototype);
+    expect(Object.prototype.hasOwnProperty.call(dereffed, "__proto__")).toBe(true);
+    expect(dereffed["__proto__"]).toStrictEqual({ type: "string" });
+  });
+
+  it("resolves a deeply frozen input without attempting writes (#753)", async () => {
+    const input: any = {
+      title: "node",
+      type: "object",
+      properties: { child: { $ref: "#/definitions/node" } },
+      definitions: {
+        node: {
+          title: "node",
+          type: "object",
+          properties: { next: { $ref: "#/definitions/node" } },
+        },
+      },
+    };
+    const seen = new Set();
+    const deepFreeze = (o: any): void => {
+      if (o !== null && typeof o === "object" && !seen.has(o)) {
+        seen.add(o);
+        for (const k of Object.keys(o)) {
+          deepFreeze(o[k]);
+        }
+        Object.freeze(o);
+      }
+    };
+    deepFreeze(input);
+
+    const dereffed = await new Dereferencer(input).resolve() as any;
+
+    expect(dereffed.properties.child.properties.next).toBe(dereffed.properties.child);
+  });
+
+  it("never writes into objects returned by protocol handlers (#753)", async () => {
+    const sharedItem = { title: "shared", type: "string" };
+    const documents: any = {
+      "ex://a": { $ref: "ex://b", title: "a-title" },
+      "ex://b": { type: "string" },
+      "ex://shared": sharedItem,
+      "ex://user": { properties: { s: { $ref: "ex://shared" } } },
+    };
+    const snapshot = JSON.parse(JSON.stringify(documents));
+
+    const dereffed = await new Dereferencer(
+      { properties: { a: { $ref: "ex://a" }, u: { $ref: "ex://user" } } } as JSONSchema,
+      { protocolHandlerMap: { ex: (ref: string) => Promise.resolve(documents[ref]) } },
+    ).resolve() as any;
+
+    expect(documents).toStrictEqual(snapshot);
+    expect(documents["ex://shared"]).toBe(sharedItem);
+    expect(dereffed.properties.a).toStrictEqual({ type: "string", title: "a-title" });
+    expect(dereffed.properties.u.properties.s).toStrictEqual({ title: "shared", type: "string" });
+    expect(dereffed.properties.u.properties.s).not.toBe(sharedItem);
+  });
+
   it("can deal with root refs-to-ref as url, metaschema on master", async () => {
     expect.assertions(8);
     const dereferencer = new Dereferencer({
@@ -788,5 +864,57 @@ describe("resolveSync options", () => {
     expect(() => dereferencer.resolveSync()).toThrow(
       "options.rootSchema was not provided"
     );
+  });
+
+  it("closes cycles without mutating the input (#753)", () => {
+    const input = {
+      title: "node",
+      type: "object",
+      properties: { child: { $ref: "#/definitions/node" } },
+      definitions: {
+        node: {
+          title: "node",
+          type: "object",
+          properties: { next: { $ref: "#/definitions/node" } },
+        },
+      },
+    } as any;
+    const snapshot = JSON.parse(JSON.stringify(input));
+
+    const dereffed = new Dereferencer(input as JSONSchema).resolveSync() as any;
+
+    expect(input).toStrictEqual(snapshot);
+    expect(() => JSON.stringify(input)).not.toThrow();
+    expect(dereffed.properties.child.properties.next).toBe(dereffed.properties.child);
+    expect(dereffed.properties.child).not.toBe(input.definitions.node);
+  });
+
+  it("preserves shared identity for repeated refs (#753)", () => {
+    const dereffed = new Dereferencer({
+      type: "object",
+      properties: {
+        a: { $ref: "#/definitions/s" },
+        b: { $ref: "#/definitions/s" },
+      },
+      definitions: { s: { type: "string" } },
+    } as JSONSchema).resolveSync() as any;
+
+    expect(dereffed.properties.a).toBe(dereffed.properties.b);
+    expect(dereffed.properties.a).toStrictEqual({ type: "string" });
+  });
+
+  it("does not mutate the input when inlining refs (#753)", () => {
+    const input = {
+      type: "object",
+      properties: {
+        foo: { type: "string" },
+        bar: { $ref: "#/properties/foo" },
+      },
+    } as any;
+    const snapshot = JSON.parse(JSON.stringify(input));
+
+    new Dereferencer(input as JSONSchema).resolveSync();
+
+    expect(input).toStrictEqual(snapshot);
   });
 });

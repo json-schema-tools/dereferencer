@@ -80,6 +80,11 @@ const copyOrNot = (s1: JSONSchemaObject, s2: JSONSchema) => {
  * and other non-plain objects (class instances, Dates, ...) are passed
  * through by reference: the dereferencer never writes into them, so sharing
  * them is safe.
+ *
+ * Own properties are defined explicitly rather than assigned: a plain
+ * `copy[k] = ...` would invoke the inherited setter for an own property
+ * named `__proto__` instead of creating an own property. The prototype
+ * (including null) is preserved.
  */
 const deepCopySchema = (value: any, seen: Map<object, any> = new Map()): any => {
   if (value === null || typeof value !== "object") {
@@ -101,10 +106,15 @@ const deepCopySchema = (value: any, seen: Map<object, any> = new Map()): any => 
   if (proto !== Object.prototype && proto !== null) {
     return value;
   }
-  const copy: { [k: string]: any } = {};
+  const copy: { [k: string]: any } = Object.create(proto);
   seen.set(value, copy);
   for (const k of Object.keys(value)) {
-    copy[k] = deepCopySchema(value[k], seen);
+    Object.defineProperty(copy, k, {
+      value: deepCopySchema(value[k], seen),
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
   }
   return copy;
 }
@@ -126,6 +136,11 @@ export default class Dereferencer {
 
   constructor(schema: JSONSchema, private options: DereferencerOptions = {}) {
 
+    // One memoization map per resolution context: if the schema shares nodes
+    // with an explicitly supplied rootSchema (or is one of its nodes), the
+    // copies keep that identity relationship instead of diverging (#753).
+    const seen = new Map<object, any>();
+
     let workingSchema: JSONSchema;
     if (this.options.mutate === true) {
       workingSchema = schema;
@@ -133,7 +148,7 @@ export default class Dereferencer {
       // A shallow copy is not enough: nested objects are still the caller's,
       // and resolving (especially cycles, see #753) writes into them.
       // deepCopySchema passes booleans through untouched.
-      workingSchema = deepCopySchema(schema);
+      workingSchema = deepCopySchema(schema, seen);
     }
 
     if (this.options.recursive === undefined) {
@@ -149,8 +164,9 @@ export default class Dereferencer {
     }
 
     if (this.options.mutate !== true && this.options.rootSchema !== workingSchema) {
-      // A caller-provided rootSchema is also not ours to write to.
-      this.options.rootSchema = deepCopySchema(this.options.rootSchema);
+      // A caller-provided rootSchema is also not ours to write to. It shares
+      // the memoization map so nodes shared with the schema stay shared.
+      this.options.rootSchema = deepCopySchema(this.options.rootSchema, seen);
     }
 
     if (this.options.refCache) {
@@ -233,14 +249,20 @@ export default class Dereferencer {
         const subDerefferOpts = {
           ...this.options,
           refCache: this.refCache,
+          // Same in-place cycle closing as the async path: the cache
+          // pre-set above points self-references at the object being
+          // resolved (#753). Sync refs are always local (see the throw
+          // above), so `fetched` is always inside our owned graph.
+          mutate: true,
         };
 
-        const subDereffer = new Dereferencer(fetched, subDerefferOpts);
+        const subSchema = fetched;
+        const subDereffer = new Dereferencer(subSchema, subDerefferOpts);
         if (subDereffer.refs.length !== 0) {
           const subFetched = subDereffer._resolveSync();
-          this.refCache[ref] = copyOrNot(fetched, subFetched);
+          this.refCache[ref] = copyOrNot(subSchema, subFetched);
         } else {
-          this.refCache[ref] = fetched;
+          this.refCache[ref] = subSchema;
         }
       } else {
         this.refCache[ref] = fetched;
@@ -278,6 +300,12 @@ export default class Dereferencer {
     const proms = [];
     for (const ref of unfetchedRefs) {
       let fetched;
+      // True only when the value came fresh from the resolver below and may
+      // be a foreign object. A ref can be absent from the `unfetchedRefs`
+      // snapshot yet already cached when its turn comes (a sub-resolution
+      // may have cached it); such values are already owned or detached, and
+      // detaching again would fork the shared identity.
+      let fetchedFromResolver = false;
       if (this.refCache[ref] !== undefined) {
         fetched = this.refCache[ref];
       } else if (ref === "#") {
@@ -290,6 +318,7 @@ export default class Dereferencer {
         proms.push(refProm);
         fetched = await refProm as JSONSchema;
         this.refCache[ref] = fetched
+        fetchedFromResolver = true;
       }
 
       if (this.options.recursive === true && fetched !== true && fetched !== false && ref !== "#") {
@@ -303,7 +332,7 @@ export default class Dereferencer {
         };
 
         let subSchema = fetched;
-        if (!isLocalRef(ref)) {
+        if (!isLocalRef(ref) && fetchedFromResolver) {
           // A fetched document is not ours to change: detach it first and
           // re-point the cache at the detached copy, so self-references
           // close the loop on the copy rather than the handler's object.
@@ -316,9 +345,11 @@ export default class Dereferencer {
           const subFetchedProm = subDereffer._resolve();
           proms.push(subFetchedProm);
           const subFetched = await subFetchedProm;
-          this.refCache[ref] = copyOrNot(fetched, subFetched);
+          // Use the owned graph throughout: after detachment `fetched` may
+          // be a foreign object that must not flow back into the cache.
+          this.refCache[ref] = copyOrNot(subSchema, subFetched);
         } else {
-          this.refCache[ref] = fetched;
+          this.refCache[ref] = subSchema;
         }
       } else {
         this.refCache[ref] = fetched;
