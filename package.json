@@ -40,7 +40,7 @@
     "jest-it-up": "^4.0.1",
     "ts-jest": "^29.0.5",
     "typedoc": "^0.28.20",
-    "typescript": "^5.4.5"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@json-schema-tools/reference-resolver": "^1.2.6",
